@@ -1,0 +1,30 @@
+# Node.js
+node_modules/
+npm-debug.log*
+package-lock.json
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Entornos
+.env
+.env.local
+
+# Build
+dist/
+build/
+
+# Otros
+*.tmp
+*.temp
