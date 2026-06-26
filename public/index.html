@@ -171,10 +171,6 @@
                 Guardar configuración
               </button>
 
-              <button id="edit-settings-button" class="secondary-button" type="button">
-                Editar partida
-              </button>
-
               <button id="start-game-button" class="primary-button" type="button">
                 Comenzar partida
               </button>
@@ -326,11 +322,24 @@
         </p>
 
         <section class="public-village-preview">
-          <p class="eyebrow">Tu vista</p>
-          <h3>Información del jugador</h3>
-          <p>
-            Próximamente aquí aparecerá tu rol, la fase actual y las acciones disponibles para ti.
+          <p class="eyebrow">Tu vista privada</p>
+          <h3 id="private-player-title">Información del jugador</h3>
+
+          <p id="private-role-placeholder">
+            Tu rol aparecerá aquí cuando el narrador comience la partida.
           </p>
+
+          <button id="reveal-role-button" class="primary-button" type="button" hidden>
+            Mantener pulsado para ver mi rol
+          </button>
+
+          <div id="private-role-card" class="private-role-card" hidden>
+            <span>Tu rol</span>
+            <strong id="private-role-label">Sin asignar</strong>
+            <p id="private-role-description">
+              Espera a que el servidor asigne los roles.
+            </p>
+          </div>
         </section>
       </div>
     </section>

@@ -32,6 +32,7 @@ const PARTICIPANT_ID_STORAGE_KEY = 'metricasClasificacion.participantId';
 let currentVillageCode = null;
 let currentUserRole = null;
 let latestVillageState = null;
+let pendingPrivatePlayerState = null;
 
 function createParticipantId() {
   if (window.crypto?.randomUUID) {
@@ -172,6 +173,132 @@ function showGameScreen(screenId) {
 
 function formatSeconds(seconds) {
   return `${seconds} s`;
+}
+
+function hidePrivateRole() {
+  const privateRoleCard = getElement('private-role-card');
+  const privateRolePlaceholder = getElement('private-role-placeholder');
+  const revealRoleButton = getElement('reveal-role-button');
+
+  pendingPrivatePlayerState = null;
+
+  if (privateRoleCard) {
+    privateRoleCard.hidden = true;
+    privateRoleCard.classList.remove('role-ready');
+  }
+
+  if (privateRolePlaceholder) {
+    privateRolePlaceholder.hidden = false;
+    privateRolePlaceholder.textContent = 'Tu rol aparecerá aquí cuando el narrador comience la partida.';
+  }
+
+  if (revealRoleButton) {
+    revealRoleButton.hidden = true;
+  }
+
+  setText('private-player-title', 'Información del jugador');
+  setText('private-role-label', 'Sin asignar');
+  setText('private-role-description', 'Espera a que el servidor asigne los roles.');
+}
+
+function renderPrivatePlayerState(privateState) {
+  const privateRoleCard = getElement('private-role-card');
+  const privateRolePlaceholder = getElement('private-role-placeholder');
+  const revealRoleButton = getElement('reveal-role-button');
+
+  if (!privateState) {
+    hidePrivateRole();
+    return;
+  }
+
+  pendingPrivatePlayerState = privateState;
+
+  if (privateRoleCard) {
+    privateRoleCard.hidden = false;
+    privateRoleCard.classList.add('role-ready');
+  }
+
+  if (privateRolePlaceholder) {
+    privateRolePlaceholder.hidden = false;
+    privateRolePlaceholder.textContent = `${privateState.playerName}, mantén pulsado el botón para ver tu rol. Suelta para ocultarlo.`;
+  }
+
+  if (revealRoleButton) {
+    revealRoleButton.hidden = false;
+    revealRoleButton.textContent = 'Mantener pulsado para ver mi rol';
+  }
+
+  const descriptions = {
+    killer: 'Tu objetivo es sobrevivir sin ser descubierto. Cuando llegue la fase correspondiente, podrás actuar como asesino.',
+    villager: 'Tu objetivo es observar, discutir y votar para intentar descubrir a los asesinos del pueblo.',
+  };
+
+  setText('private-player-title', `Jugador: ${privateState.playerName}`);
+  setText('private-role-label', privateState.roleLabel);
+  setText(
+    'private-role-description',
+    descriptions[privateState.role] || 'Rol asignado. Espera las instrucciones de la partida.'
+  );
+}
+
+function showPrivateRoleWhilePressed() {
+  const privateRoleCard = getElement('private-role-card');
+  const privateRolePlaceholder = getElement('private-role-placeholder');
+  const revealRoleButton = getElement('reveal-role-button');
+
+  if (!pendingPrivatePlayerState) {
+    return;
+  }
+
+  const descriptions = {
+    killer: 'Tu objetivo es sobrevivir sin ser descubierto. Cuando llegue la fase correspondiente, podrás actuar como asesino.',
+    villager: 'Tu objetivo es observar, discutir y votar para intentar descubrir a los asesinos del pueblo.',
+  };
+
+  if (privateRoleCard) {
+    privateRoleCard.hidden = false;
+  }
+
+  if (privateRolePlaceholder) {
+    privateRolePlaceholder.hidden = true;
+  }
+
+  if (revealRoleButton) {
+    revealRoleButton.textContent = 'Suelta para ocultar mi rol';
+  }
+
+  setText('private-role-label', pendingPrivatePlayerState.roleLabel);
+  setText(
+    'private-role-description',
+    descriptions[pendingPrivatePlayerState.role] || 'Rol asignado. Espera las instrucciones de la partida.'
+  );
+}
+
+function hidePrivateRoleAfterRelease() {
+  const privateRoleCard = getElement('private-role-card');
+  const privateRolePlaceholder = getElement('private-role-placeholder');
+  const revealRoleButton = getElement('reveal-role-button');
+
+  if (!pendingPrivatePlayerState) {
+    return;
+  }
+
+  if (privateRoleCard) {
+    privateRoleCard.hidden = true;
+  }
+
+  if (privateRolePlaceholder) {
+    privateRolePlaceholder.hidden = false;
+    privateRolePlaceholder.textContent = `${pendingPrivatePlayerState.playerName}, mantén pulsado el botón para ver tu rol. Suelta para ocultarlo.`;
+  }
+
+  if (revealRoleButton) {
+    revealRoleButton.hidden = false;
+    revealRoleButton.textContent = 'Mantener pulsado para ver mi rol';
+  }
+
+  setText('private-role-label', 'Oculto');
+  setText('private-role-description', 'Mantén pulsado el botón para revelar tu rol privado.');
 }
 
 function getSettingsFromForm() {
@@ -334,7 +461,6 @@ function updateNarratorButtons(village) {
   setDisabled('reopen-village-button', !isSetup);
   setDisabled('delete-village-button', isLive);
   setDisabled('save-settings-button', !isSetup);
-  setDisabled('edit-settings-button', isLive);
   setDisabled('start-game-button', !isSetup);
 }
 
@@ -382,7 +508,7 @@ function renderVillageState(village) {
     if (village.status === 'live') {
       hideNotice('narrator');
       showGameScreen('narrator-live-screen');
-      setText('live-narrator-status', `La partida de ${villageName} ha comenzado. Habitantes: ${currentPlayers}.`);
+      setText('live-narrator-status', `La partida de ${villageName} ha comenzado. Los habitantes están viendo qué roles les ha tocado. Habitantes: ${currentPlayers}.`);
     } else {
       showGameScreen('village-setup-screen');
     }
@@ -395,6 +521,7 @@ function renderVillageState(village) {
       showGameScreen('player-live-screen');
       setText('live-player-status', `La partida de ${villageName} ha comenzado. Espera las instrucciones del narrador.`);
     } else {
+      hidePrivateRole();
       showGameScreen('player-waiting-screen');
       setText('waiting-village-status', `Te has unido a ${villageName}. Espera a que ${narratorName} inicie la partida.`);
       setText('village-status', `Habitantes actuales: ${currentPlayers}. Estado: ${village.statusLabel}.`);
@@ -434,13 +561,51 @@ function setupLobby() {
   });
 }
 
+function setupPrivateRoleReveal() {
+  const revealRoleButton = getElement('reveal-role-button');
+  const privateRoleCard = getElement('private-role-card');
+
+  if (!revealRoleButton || !privateRoleCard) {
+    return;
+  }
+
+  const showRole = (event) => {
+    event.preventDefault();
+    privateRoleCard.classList.add('is-revealing');
+  };
+
+  const hideRole = () => {
+    privateRoleCard.classList.remove('is-revealing');
+  };
+
+  revealRoleButton.addEventListener('touchstart', showRole, { passive: false });
+  revealRoleButton.addEventListener('touchend', hideRole);
+  revealRoleButton.addEventListener('touchcancel', hideRole);
+
+  revealRoleButton.addEventListener('pointerdown', (event) => {
+    if (event.pointerType === 'touch') {
+      showRole(event);
+    }
+  });
+
+  revealRoleButton.addEventListener('pointerup', hideRole);
+  revealRoleButton.addEventListener('pointercancel', hideRole);
+  revealRoleButton.addEventListener('pointerleave', hideRole);
+
+  window.addEventListener('blur', hideRole);
+
+  revealRoleButton.addEventListener('contextmenu', (event) => {
+    event.preventDefault();
+  });
+}
+
+
 function setupVillageSettings() {
   const completeVillageButton = getElement('complete-village-button');
   const reopenVillageButton = getElement('reopen-village-button');
   const deleteVillageButton = getElement('delete-village-button');
   const leaveVillageButton = getElement('leave-village-button');
   const saveSettingsButton = getElement('save-settings-button');
-  const editSettingsButton = getElement('edit-settings-button');
   const startGameButton = getElement('start-game-button');
 
   completeVillageButton?.addEventListener('click', () => {
@@ -488,12 +653,6 @@ function setupVillageSettings() {
     });
   });
 
-  editSettingsButton?.addEventListener('click', () => {
-    if (latestVillageState) {
-      renderVillageState(latestVillageState);
-    }
-  });
-
   startGameButton?.addEventListener('click', () => {
     socket.emit('village:start', {
       participantId,
@@ -520,6 +679,7 @@ function resetVillageUi(message) {
 
   renderPlayers('setup-players-list', []);
   renderPlayers('players-list', []);
+  hidePrivateRole();
   showGameScreen('game-entry-screen');
 }
 
@@ -623,6 +783,11 @@ socket.on('village:started', (village) => {
   renderVillageState(village);
 });
 
+socket.on('player:private-state', (privateState) => {
+  console.log('Private player state received.');
+  renderPrivatePlayerState(privateState);
+});
+
 socket.on('village:error', (error) => {
   console.warn(error.message);
 
@@ -647,6 +812,8 @@ document.addEventListener('DOMContentLoaded', () => {
   setupNavigation();
   setupLobby();
   setupVillageSettings();
+  setupPrivateRoleReveal();
+  hidePrivateRole();
   renderView(window.location.pathname, false);
   showGameScreen('game-entry-screen');
 });

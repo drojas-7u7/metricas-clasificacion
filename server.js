@@ -38,6 +38,11 @@ const statusLabels = {
   live: 'Partida iniciada',
 };
 
+const roleLabels = {
+  killer: 'Asesino',
+  villager: 'Vecino',
+};
+
 function normalizeParticipantId(participantId) {
   return String(participantId || '').trim().slice(0, 80);
 }
@@ -101,6 +106,39 @@ function generateVillageCode() {
   return code;
 }
 
+function shuffleArray(items) {
+  const shuffledItems = [...items];
+
+  for (let index = shuffledItems.length - 1; index > 0; index -= 1) {
+    const randomIndex = Math.floor(Math.random() * (index + 1));
+    [shuffledItems[index], shuffledItems[randomIndex]] = [shuffledItems[randomIndex], shuffledItems[index]];
+  }
+
+  return shuffledItems;
+}
+
+function clearPlayerRoles(village) {
+  village.players = village.players.map((player) => ({
+    ...player,
+    role: null,
+  }));
+}
+
+function assignRolesToPlayers(village) {
+  clearPlayerRoles(village);
+
+  const shuffledPlayers = shuffleArray(village.players);
+  const killersCount = village.settings.killersCount;
+  const killerParticipantIds = new Set(
+    shuffledPlayers.slice(0, killersCount).map((player) => player.participantId)
+  );
+
+  village.players = village.players.map((player) => ({
+    ...player,
+    role: killerParticipantIds.has(player.participantId) ? 'killer' : 'villager',
+  }));
+}
+
 function getPublicVillagesList() {
   return Array.from(villages.values()).map((village) => ({
     code: village.code,
@@ -134,6 +172,42 @@ function getPublicVillageState(village) {
     currentPlayers: village.players.length,
     settings: village.settings,
   };
+}
+
+function getPrivatePlayerState(village, participantId) {
+  const player = village.players.find((candidate) => candidate.participantId === participantId);
+
+  if (!player || !player.role) {
+    return null;
+  }
+
+  return {
+    villageCode: village.code,
+    villageName: village.name,
+    playerName: player.name,
+    role: player.role,
+    roleLabel: roleLabels[player.role] || player.role,
+  };
+}
+
+function emitPrivatePlayerState(village, player) {
+  if (!player.socketId || !player.role) {
+    return;
+  }
+
+  const privateState = getPrivatePlayerState(village, player.participantId);
+
+  if (!privateState) {
+    return;
+  }
+
+  io.to(player.socketId).emit('player:private-state', privateState);
+}
+
+function emitPrivatePlayerStates(village) {
+  village.players.forEach((player) => {
+    emitPrivatePlayerState(village, player);
+  });
 }
 
 function emitVillagesList() {
@@ -228,6 +302,10 @@ function restoreParticipantConnection(socket, participantId) {
     role,
     village: getPublicVillageState(village),
   });
+
+  if (role === 'player' && player && village.status === 'live') {
+    emitPrivatePlayerState(village, player);
+  }
 
   emitVillageState(village.code);
 }
@@ -433,6 +511,7 @@ io.on('connection', (socket) => {
       socketId: socket.id,
       name: cleanPlayerName,
       connected: true,
+      role: null,
     });
 
     socket.join(cleanVillageCode);
@@ -510,6 +589,7 @@ io.on('connection', (socket) => {
     }
 
     village.status = 'waiting';
+    clearPlayerRoles(village);
 
     io.to(village.code).emit('village:reopened', getPublicVillageState(village));
     emitVillageState(village.code);
@@ -646,10 +726,12 @@ io.on('connection', (socket) => {
       return;
     }
 
+    assignRolesToPlayers(village);
     village.status = 'live';
 
     io.to(village.code).emit('village:started', getPublicVillageState(village));
     emitVillageState(village.code);
+    emitPrivatePlayerStates(village);
 
     console.log(`Village started: ${village.code}`);
   });
