@@ -37,72 +37,302 @@
     </section>
 
     <section class="view" data-view="/game">
-      <p class="eyebrow">Experiencia multiplayer</p>
-      <h2>El Pueblo Duerme</h2>
-      <p>
-        Crea un pueblo como narrador o únete como jugador. Esta será la dinámica que generará los datos reales para explicar la Confusion Matrix y las métricas de clasificación.
-      </p>
+      <div id="game-entry-screen" class="game-screen active">
+        <p class="eyebrow">Experiencia multiplayer</p>
+        <h2>El Pueblo Duerme</h2>
+        <p>
+          Crea un pueblo como narrador o únete como jugador. El código sirve solo como invitación; el pueblo tendrá su propio nombre, habitantes actuales y estado de partida.
+        </p>
 
-      <div class="lobby-layout">
-        <article class="lobby-card">
-          <h3>Soy narrador</h3>
-          <p>
-            Crea un pueblo y comparte el código con tus compañeros para que entren desde sus dispositivos.
-          </p>
+        <section class="active-villages-panel" aria-live="polite">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Pueblos disponibles</p>
+              <h3>Pueblos creados</h3>
+            </div>
 
-          <label class="form-field" for="narrator-name">
-            Tu nombre
-            <input id="narrator-name" type="text" placeholder="Ejemplo: David" autocomplete="name" />
-          </label>
+            <button id="refresh-villages-button" class="secondary-button" type="button">
+              Actualizar
+            </button>
+          </div>
 
-          <button id="create-village-button" class="primary-button" type="button">
-            Crear pueblo
-          </button>
-        </article>
+          <ul id="active-villages-list" class="villages-list">
+            <li class="empty-state">Todavía no hay pueblos creados.</li>
+          </ul>
+        </section>
 
-        <article class="lobby-card">
-          <h3>Soy jugador</h3>
-          <p>
-            Introduce tu nombre y el código del pueblo para unirte a la partida.
-          </p>
+        <div class="lobby-layout">
+          <article class="lobby-card">
+            <h3>Soy narrador</h3>
+            <p>
+              Crea un pueblo, espera a que entren los habitantes y marca el pueblo como completo antes de configurar la partida.
+            </p>
 
-          <label class="form-field" for="player-name">
-            Tu nombre
-            <input id="player-name" type="text" placeholder="Ejemplo: Ana" autocomplete="name" />
-          </label>
+            <label class="form-field" for="narrator-name">
+              Tu nombre
+              <input id="narrator-name" type="text" placeholder="Ejemplo: David" autocomplete="name" />
+            </label>
 
-          <label class="form-field" for="village-code-input">
-            Código del pueblo
-            <input id="village-code-input" type="text" placeholder="Ejemplo: ALISIOS" autocomplete="off" />
-          </label>
+            <label class="form-field" for="village-name">
+              Nombre del pueblo
+              <input id="village-name" type="text" placeholder="Ejemplo: Villa Alisos" autocomplete="off" />
+            </label>
 
-          <button id="join-village-button" class="secondary-button" type="button">
-            Unirse al pueblo
-          </button>
-        </article>
+            <button id="create-village-button" class="primary-button" type="button">
+              Crear pueblo
+            </button>
+          </article>
+
+          <article class="lobby-card">
+            <h3>Soy jugador</h3>
+            <p>
+              Introduce tu nombre y el código de invitación para unirte al pueblo.
+            </p>
+
+            <label class="form-field" for="player-name">
+              Tu nombre
+              <input id="player-name" type="text" placeholder="Ejemplo: Ana" autocomplete="name" />
+            </label>
+
+            <label class="form-field" for="village-code-input">
+              Código de invitación
+              <input id="village-code-input" type="text" placeholder="Ejemplo: SPSVH" autocomplete="off" />
+            </label>
+
+            <button id="join-village-button" class="secondary-button" type="button">
+              Unirse al pueblo
+            </button>
+          </article>
+        </div>
       </div>
 
-      <section class="village-panel" aria-live="polite">
-        <div>
-          <p class="eyebrow">Estado del pueblo</p>
-          <h3 id="village-title">Todavía no hay pueblo activo</h3>
-          <p id="village-status">
-            Crea un pueblo como narrador o únete con un código para empezar.
+      <div id="village-setup-screen" class="game-screen" hidden>
+        <p class="eyebrow">Panel del narrador</p>
+        <h2>Gestionar pueblo</h2>
+        <p>
+          Primero espera a que entren los habitantes. Cuando estén todos, marca el pueblo como completo y configura la partida antes de comenzar.
+        </p>
+
+        <div class="game-board-layout">
+          <aside class="narrator-tools">
+            <p class="eyebrow">Herramientas del narrador</p>
+            <h3>Control del pueblo</h3>
+
+            <div class="status-card">
+              <span>Estado</span>
+              <strong id="setup-status-label">Esperando habitantes</strong>
+            </div>
+
+            <div class="button-row">
+              <button id="complete-village-button" class="primary-button" type="button">
+                Pueblo completo
+              </button>
+
+              <button id="reopen-village-button" class="secondary-button" type="button">
+                Reabrir pueblo
+              </button>
+
+              <button id="delete-village-button" class="danger-button" type="button">
+                Eliminar pueblo
+              </button>
+            </div>
+
+            <div id="narrator-notice" class="notice-box" hidden></div>
+
+            <hr class="soft-divider" />
+
+            <h3>Configuración de partida</h3>
+            <p>
+              Esta configuración se aplica cuando el pueblo ya está completo.
+            </p>
+
+            <label class="form-field" for="killers-count-input">
+              Asesinos
+              <input id="killers-count-input" type="number" min="1" max="10" value="2" />
+            </label>
+
+            <label class="form-field" for="discussion-time-input">
+              Tiempo de discusión, en segundos
+              <input id="discussion-time-input" type="number" min="15" max="600" step="15" value="120" />
+            </label>
+
+            <label class="form-field" for="killers-time-input">
+              Tiempo de los asesinos, en segundos
+              <input id="killers-time-input" type="number" min="10" max="300" step="5" value="30" />
+            </label>
+
+            <label class="form-field" for="voting-time-input">
+              Tiempo de votación, en segundos
+              <input id="voting-time-input" type="number" min="10" max="300" step="5" value="45" />
+            </label>
+
+            <div class="button-row">
+              <button id="save-settings-button" class="secondary-button" type="button">
+                Guardar configuración
+              </button>
+
+              <button id="edit-settings-button" class="secondary-button" type="button">
+                Editar partida
+              </button>
+
+              <button id="start-game-button" class="primary-button" type="button">
+                Comenzar partida
+              </button>
+            </div>
+          </aside>
+
+          <section class="public-village-preview" aria-live="polite">
+            <p class="eyebrow">Vista pública del pueblo</p>
+            <h3 id="setup-village-name">Pueblo sin nombre</h3>
+
+            <div class="village-overview-grid">
+              <div class="village-code-box">
+                <span>Código de invitación</span>
+                <strong id="setup-village-code">----</strong>
+              </div>
+
+              <div class="status-card">
+                <span>Habitantes actuales</span>
+                <strong id="setup-current-players">0</strong>
+              </div>
+            </div>
+
+            <dl class="settings-summary">
+              <div>
+                <dt>Estado</dt>
+                <dd id="summary-status">Esperando habitantes</dd>
+              </div>
+              <div>
+                <dt>Asesinos</dt>
+                <dd id="summary-killers-count">2</dd>
+              </div>
+              <div>
+                <dt>Discusión</dt>
+                <dd id="summary-discussion-time">120 s</dd>
+              </div>
+              <div>
+                <dt>Tiempo asesinos</dt>
+                <dd id="summary-killers-time">30 s</dd>
+              </div>
+              <div>
+                <dt>Votación</dt>
+                <dd id="summary-voting-time">45 s</dd>
+              </div>
+            </dl>
+
+            <div class="players-panel">
+              <h3>Habitantes conectados</h3>
+              <ul id="setup-players-list" class="players-list">
+                <li class="empty-state">Aún no hay habitantes conectados.</li>
+              </ul>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <div id="player-waiting-screen" class="game-screen" hidden>
+        <p class="eyebrow">Sala de espera</p>
+        <h2 id="waiting-village-name">Esperando al pueblo</h2>
+        <p id="waiting-village-status">
+          Te has unido correctamente. Espera a que el narrador complete el pueblo e inicie la partida.
+        </p>
+
+        <button id="leave-village-button" class="danger-button" type="button">
+          Salir del pueblo
+        </button>
+
+        <div id="player-notice" class="notice-box" hidden></div>
+
+        <section class="village-panel" aria-live="polite">
+          <div>
+            <p class="eyebrow">Información visible</p>
+            <h3 id="waiting-village-title">Pueblo activo</h3>
+            <p id="village-status">
+              Esperando al narrador.
+            </p>
+          </div>
+
+          <div class="village-overview-grid">
+            <div class="village-code-box">
+              <span>Código</span>
+              <strong id="village-code-display">----</strong>
+            </div>
+
+            <div class="status-card">
+              <span>Habitantes actuales</span>
+              <strong id="waiting-current-players">0</strong>
+            </div>
+          </div>
+
+          <dl class="settings-summary">
+            <div>
+              <dt>Estado</dt>
+              <dd id="waiting-status">Esperando habitantes</dd>
+            </div>
+            <div>
+              <dt>Asesinos</dt>
+              <dd id="waiting-killers-count">2</dd>
+            </div>
+            <div>
+              <dt>Discusión</dt>
+              <dd id="waiting-discussion-time">120 s</dd>
+            </div>
+            <div>
+              <dt>Tiempo asesinos</dt>
+              <dd id="waiting-killers-time">30 s</dd>
+            </div>
+            <div>
+              <dt>Votación</dt>
+              <dd id="waiting-voting-time">45 s</dd>
+            </div>
+          </dl>
+
+          <div class="players-panel">
+            <h3>Habitantes conectados</h3>
+            <ul id="players-list" class="players-list">
+              <li class="empty-state">Aún no hay habitantes conectados.</li>
+            </ul>
+          </div>
+        </section>
+      </div>
+
+      <div id="narrator-live-screen" class="game-screen" hidden>
+        <p class="eyebrow">Partida</p>
+        <h2>El pueblo está en marcha</h2>
+        <p>
+          Vista del narrador. Aquí estarán las herramientas de control de fases, votos y eventos del pueblo.
+        </p>
+
+        <div class="game-board-layout">
+          <aside class="narrator-tools">
+            <p class="eyebrow">Herramientas del narrador</p>
+            <h3>Panel de control</h3>
+            <p>Próximamente: noche, discusión, votación, acusaciones y cierre de ronda.</p>
+          </aside>
+
+          <section class="public-village-preview">
+            <p class="eyebrow">Estado del pueblo</p>
+            <h3 id="live-narrator-village-name">Pueblo activo</h3>
+            <p id="live-narrator-status">La partida ha comenzado.</p>
+          </section>
+        </div>
+      </div>
+
+      <div id="player-live-screen" class="game-screen" hidden>
+        <p class="eyebrow">Partida</p>
+        <h2 id="live-player-village-name">El pueblo está en marcha</h2>
+        <p id="live-player-status">
+          La partida ha comenzado. Espera las instrucciones del narrador.
+        </p>
+
+        <section class="public-village-preview">
+          <p class="eyebrow">Tu vista</p>
+          <h3>Información del jugador</h3>
+          <p>
+            Próximamente aquí aparecerá tu rol, la fase actual y las acciones disponibles para ti.
           </p>
-        </div>
-
-        <div class="village-code-box">
-          <span>Código</span>
-          <strong id="village-code-display">----</strong>
-        </div>
-
-        <div class="players-panel">
-          <h3>Jugadores conectados</h3>
-          <ul id="players-list" class="players-list">
-            <li class="empty-state">Aún no hay jugadores conectados.</li>
-          </ul>
-        </div>
-      </section>
+        </section>
+      </div>
     </section>
 
     <section class="view" data-view="/results">
