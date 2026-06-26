@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Classification Metrics | El Pueblo Duerme</title>
+
+  <meta
+    name="description"
+    content="Web interactiva para aprender métricas de clasificación mediante una dinámica multiplayer en tiempo real."
+  />
+
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <nav class="main-nav" aria-label="Navegación principal">
+      <a href="/" data-route="/">Inicio</a>
+      <a href="/game" data-route="/game">El Pueblo Duerme</a>
+      <a href="/results" data-route="/results">Resultados</a>
+      <a href="/definitions" data-route="/definitions">Definiciones</a>
+      <a href="/cases" data-route="/cases">Casos Reales</a>
+      <a href="/debate" data-route="/debate">Debate</a>
+      <a href="/simulator" data-route="/simulator">Simulador</a>
+      <a href="/closing" data-route="/closing">Cierre</a>
+    </nav>
+  </header>
+
+  <main class="app-shell">
+    <section class="view hero-section" data-view="/">
+      <p class="eyebrow">Mini-clase interactiva</p>
+      <h1>Classification Metrics</h1>
+      <p class="subtitle">Accuracy, Recall, Precision y F1-Score</p>
+      <p class="author">David Rojas Cruz</p>
+      <a class="primary-button" href="/game" data-route="/game">Comenzar</a>
+    </section>
+
+    <section class="view" data-view="/game">
+      <p class="eyebrow">Experiencia multiplayer</p>
+      <h2>El Pueblo Duerme</h2>
+      <p>
+        Una dinámica en tiempo real donde el grupo genera sus propios datos para entender las métricas de clasificación.
+      </p>
+
+      <div class="placeholder-card">
+        <h3>Zona de juego</h3>
+        <p>Aquí construiremos la creación del pueblo, entrada de jugadores, roles, fases y votaciones.</p>
+      </div>
+    </section>
+
+    <section class="view" data-view="/results">
+      <p class="eyebrow">Datos de la partida</p>
+      <h2>Resultados</h2>
+      <p>
+        Aquí aparecerán la Confusion Matrix y las métricas calculadas a partir de las decisiones del pueblo.
+      </p>
+
+      <div class="placeholder-card">
+        <h3>Confusion Matrix + métricas</h3>
+        <p>Accuracy, Recall, Precision y F1-Score se mostrarán con los datos reales de la dinámica.</p>
+      </div>
+    </section>
+
+    <section class="view" data-view="/definitions">
+      <p class="eyebrow">Parte didáctica</p>
+      <h2>Definiciones</h2>
+      <p>
+        Explicación de Accuracy, Recall, Precision y F1-Score. Si existe una partida previa, usaremos sus datos como ejemplo.
+      </p>
+
+      <div class="placeholder-card">
+        <h3>Contenido de la enciclopedia</h3>
+        <p>Este bloque se alimentará de la explicación didáctica ya preparada.</p>
+      </div>
+    </section>
+
+    <section class="view" data-view="/cases">
+      <p class="eyebrow">Aplicación profesional</p>
+      <h2>Casos Reales</h2>
+      <p>
+        Ejemplos de medicina, fraude bancario y spam para entender que las métricas no son solo números.
+      </p>
+
+      <div class="placeholder-card">
+        <h3>Casos de uso</h3>
+        <p>Más adelante convertiremos cada caso en una tarjeta clara y profesional.</p>
+      </div>
+    </section>
+
+    <section class="view" data-view="/debate">
+      <p class="eyebrow">Reflexión ética</p>
+      <h2>Debate</h2>
+      <p class="debate-question">
+        Un modelo de predicción de incendios forestales tiene F1 del 72% a nivel nacional. En Galicia es 85% y en Extremadura 38%. ¿Es ético desplegarlo?
+      </p>
+
+      <button class="secondary-button" type="button">
+        Ver pista
+      </button>
+    </section>
+
+    <section class="view" data-view="/simulator">
+      <p class="eyebrow">Herramienta libre</p>
+      <h2>Simulador</h2>
+      <p>
+        Experimenta con valores de TP, TN, FP y FN para observar cómo cambian las métricas.
+      </p>
+
+      <div class="placeholder-card">
+        <h3>Simulador de métricas</h3>
+        <p>Primero construiremos el cálculo simple. Después añadiremos el slider de umbral.</p>
+      </div>
+    </section>
+
+    <section class="view closing-section" data-view="/closing">
+      <p class="eyebrow">Cierre</p>
+      <h2>¿Qué error estás dispuesto a aceptar?</h2>
+      <p>
+        Hemos jugado a ser un modelo de clasificación. Hemos visto que acertar mucho no basta. Lo importante es entender qué tipo de error estamos cometiendo y quién paga el precio de ese error.
+      </p>
+
+      <div class="placeholder-card">
+        <h3>David Rojas Cruz</h3>
+        <p>Proyecto didáctico interactivo sobre métricas de clasificación.</p>
+      </div>
+    </section>
+  </main>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>

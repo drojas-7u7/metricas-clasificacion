@@ -1,7 +1,14 @@
 # Node.js
 node_modules/
 npm-debug.log*
-package-lock.json
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment variables
+.env
+.env.*
+!.env.example
 
 # Editor
 .vscode/
@@ -9,7 +16,7 @@ package-lock.json
 *.swp
 *.swo
 
-# Sistema
+# System
 .DS_Store
 Thumbs.db
 
@@ -17,14 +24,19 @@ Thumbs.db
 logs/
 *.log
 
-# Entornos
-.env
-.env.local
+# Tests / coverage
+coverage/
+.nyc_output/
 
 # Build
 dist/
 build/
 
-# Otros
+# Cache
+.cache/
+.parcel-cache/
+
+# Temporary files
 *.tmp
 *.temp
+
