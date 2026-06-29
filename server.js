@@ -186,6 +186,35 @@ function getEliminationReasonLabel(reason) {
   return labels[reason] || null;
 }
 
+function createPhaseTimer(phase, durationSeconds) {
+  const safeDurationSeconds = toNumberInRange(durationSeconds, 0, 1, 3600);
+  const startedAt = Date.now();
+  const endsAt = startedAt + safeDurationSeconds * 1000;
+
+  return {
+    phase,
+    durationSeconds: safeDurationSeconds,
+    startedAt,
+    endsAt,
+  };
+}
+
+function getPublicPhaseTimer(village) {
+  const timer = village.phaseTimer;
+
+  if (!timer || timer.phase !== village.phase) {
+    return null;
+  }
+
+  const remainingSeconds = Math.max(0, Math.ceil((timer.endsAt - Date.now()) / 1000));
+
+  return {
+    ...timer,
+    remainingSeconds,
+    expired: remainingSeconds === 0,
+  };
+}
+
 function getPublicVillageState(village) {
   return {
     code: village.code,
@@ -195,6 +224,7 @@ function getPublicVillageState(village) {
     phase: village.phase,
     phaseLabel: phaseLabels[village.phase] || village.phase,
     phaseMessage: getPublicPhaseMessage(village),
+    phaseTimer: getPublicPhaseTimer(village),
     settings: {
       roundsCount: village.settings?.roundsCount,
       killersCount: village.settings?.killersCount,
@@ -252,7 +282,7 @@ function getPublicPhaseMessage(village) {
   }
 
   if (village.phase === 'voting') {
-    return 'El pueblo vota. Solo los habitantes vivos pueden votar.';
+    return 'El pueblo vota. Solo los jugadores vivos pueden votar.';
   }
 
   if (village.phase === 'votingClosed') {
@@ -448,6 +478,7 @@ function getPrivateNightAction(village, player) {
 }
 
 function clearRoundState(village) {
+  village.phaseTimer = null;
   village.finalReport = null;
   village.finalClassificationSummary = null;
   village.nightActions = {};
@@ -876,6 +907,7 @@ function finishVillageIfVictory(village) {
 
   storeFinalReport(village, victoryState);
   village.phase = 'finalResults';
+  village.phaseTimer = null;
 
   return victoryState;
 }
@@ -1287,6 +1319,7 @@ io.on('connection', (socket) => {
       name: cleanVillageName,
       status: 'waiting',
       phase: 'lobby',
+      phaseTimer: null,
       nightActions: {},
       pendingNightResult: null,
       publicNightResult: null,
@@ -1458,6 +1491,7 @@ io.on('connection', (socket) => {
 
     village.status = 'waiting';
     village.phase = 'lobby';
+    village.phaseTimer = null;
     village.nightActions = {};
     village.pendingNightResult = null;
     village.publicNightResult = null;
@@ -1613,6 +1647,7 @@ io.on('connection', (socket) => {
     assignRolesToPlayers(village);
     village.status = 'live';
     village.phase = 'roleReveal';
+    village.phaseTimer = null;
     village.nightActions = {};
     village.pendingNightResult = null;
     village.publicNightResult = null;
@@ -1657,6 +1692,7 @@ io.on('connection', (socket) => {
     }
 
     village.phase = 'night';
+    village.phaseTimer = null;
     village.nightActions = {};
     village.pendingNightResult = null;
     village.publicNightResult = null;
@@ -1690,6 +1726,7 @@ io.on('connection', (socket) => {
 
     village.pendingNightResult = buildNightResult(village);
     village.phase = 'nightClosed';
+    village.phaseTimer = null;
 
     io.to(village.code).emit('phase:changed', getPublicVillageState(village));
     emitVillageState(village.code);
@@ -1755,6 +1792,10 @@ io.on('connection', (socket) => {
     }
 
     village.phase = 'discussion';
+    village.phaseTimer = createPhaseTimer(
+      'discussion',
+      village.settings?.discussionTimeSeconds || defaultSettings.discussionTimeSeconds
+    );
 
     io.to(village.code).emit('phase:changed', getPublicVillageState(village));
     emitVillageState(village.code);
@@ -1784,6 +1825,10 @@ io.on('connection', (socket) => {
     }
 
     village.phase = 'voting';
+    village.phaseTimer = createPhaseTimer(
+      'voting',
+      village.settings?.votingTimeSeconds || defaultSettings.votingTimeSeconds
+    );
     village.votes = {};
     village.lastVotingResult = null;
     village.votingRound = 1;
@@ -1853,7 +1898,7 @@ io.on('connection', (socket) => {
 
     if (!target || target.alive === false) {
       socket.emit('village:error', {
-        message: 'Solo puedes votar a habitantes vivos.',
+        message: 'Solo puedes votar a jugadores vivos.',
       });
       return;
     }
@@ -1895,6 +1940,8 @@ io.on('connection', (socket) => {
       });
       return;
     }
+
+    village.phaseTimer = null;
 
     const votingResult = buildVotingResult(village);
     village.lastVotingResult = votingResult;
@@ -1944,6 +1991,10 @@ io.on('connection', (socket) => {
     village.votes = {};
     village.lastVotingResult = null;
     village.phase = 'voting';
+    village.phaseTimer = createPhaseTimer(
+      'voting',
+      village.settings?.votingTimeSeconds || defaultSettings.votingTimeSeconds
+    );
 
     io.to(village.code).emit('phase:changed', getPublicVillageState(village));
     emitVillageState(village.code);
@@ -2016,6 +2067,7 @@ io.on('connection', (socket) => {
 
     storeFinalReport(village, getVictoryState(village));
     village.phase = 'finalResults';
+    village.phaseTimer = null;
 
     io.to(village.code).emit('phase:changed', getPublicVillageState(village));
     emitVillageState(village.code);

@@ -35,6 +35,7 @@ let currentVillageCode = null;
 let currentUserRole = null;
 let latestVillageState = null;
 let pendingPrivatePlayerState = null;
+let phaseTimerIntervalId = null;
 
 function createParticipantId() {
   if (window.crypto?.randomUUID) {
@@ -175,6 +176,64 @@ function showGameScreen(screenId) {
 
 function formatSeconds(seconds) {
   return `${seconds} s`;
+}
+
+function formatCountdown(seconds) {
+  const safeSeconds = Math.max(0, Math.ceil(Number(seconds) || 0));
+  const minutes = Math.floor(safeSeconds / 60);
+  const remainingSeconds = String(safeSeconds % 60).padStart(2, '0');
+
+  return `${minutes}:${remainingSeconds}`;
+}
+
+function getPhaseTimerRemainingSeconds(village) {
+  const timer = village?.phaseTimer;
+
+  if (!timer || timer.phase !== village.phase || !timer.endsAt) {
+    return null;
+  }
+
+  return Math.max(0, Math.ceil((timer.endsAt - Date.now()) / 1000));
+}
+
+function getPhaseTimerText(village) {
+  const remainingSeconds = getPhaseTimerRemainingSeconds(village);
+
+  if (remainingSeconds === null) {
+    return null;
+  }
+
+  if (remainingSeconds === 0) {
+    return 'Tiempo agotado.';
+  }
+
+  return `Tiempo restante: ${formatCountdown(remainingSeconds)}.`;
+}
+
+function refreshPhaseTimerDisplay() {
+  if (!latestVillageState) {
+    return;
+  }
+
+  renderPublicPhaseState(latestVillageState);
+
+  if (getPhaseTimerRemainingSeconds(latestVillageState) === 0 && phaseTimerIntervalId) {
+    clearInterval(phaseTimerIntervalId);
+    phaseTimerIntervalId = null;
+  }
+}
+
+function restartPhaseTimerInterval(village) {
+  if (phaseTimerIntervalId) {
+    clearInterval(phaseTimerIntervalId);
+    phaseTimerIntervalId = null;
+  }
+
+  if (!village?.phaseTimer) {
+    return;
+  }
+
+  phaseTimerIntervalId = setInterval(refreshPhaseTimerDisplay, 1000);
 }
 
 function hidePrivateRole() {
@@ -524,9 +583,13 @@ function renderPublicPhaseState(village) {
   const currentRound = village.currentRound || 1;
   const totalRounds = village.settings?.roundsCount || '--';
   const roundLabel = `Ronda ${currentRound} de ${totalRounds}`;
+  const phaseTimerText = getPhaseTimerText(village);
+  const phaseLabel = phaseTimerText
+    ? `${village.phaseLabel || 'Sin fase'} · ${phaseTimerText}`
+    : village.phaseLabel || 'Sin fase';
 
-  setText('live-phase-label', village.phaseLabel || 'Sin fase');
-  setText('player-live-phase-label', village.phaseLabel || 'Sin fase');
+  setText('live-phase-label', phaseLabel);
+  setText('player-live-phase-label', phaseLabel);
   setText('live-round-label', roundLabel);
   setText('player-live-round-label', roundLabel);
   setText('night-actions-summary', `${nightActions.completedActions} / ${nightActions.requiredActions}`);
@@ -569,14 +632,14 @@ function renderPublicPhaseState(village) {
     if (village.phase === 'discussion') {
       setText(
         'live-narrator-status',
-        `Discusión en marcha. Tiempo recomendado: ${formatSeconds(village.settings.discussionTimeSeconds)}.`
+        `Discusión en marcha. ${phaseTimerText || `Tiempo recomendado: ${formatSeconds(village.settings.discussionTimeSeconds)}.`}`
       );
     }
 
     if (village.phase === 'voting') {
       setText(
         'live-narrator-status',
-        `Votación en marcha. Solo votan habitantes vivos. Tiempo recomendado: ${formatSeconds(village.settings.votingTimeSeconds)}.`
+        `Votación en marcha. Solo votan jugadores vivos. ${phaseTimerText || `Tiempo recomendado: ${formatSeconds(village.settings.votingTimeSeconds)}.`}`
       );
     }
 
@@ -1071,10 +1134,12 @@ function renderPlayerVotingPanel(village) {
 
   const selectedVote = (village.voting.publicVotes || []).find((vote) => vote.voterId === participantId);
   const isRunoff = Boolean(village.voting.isRunoff);
+  const phaseTimerText = getPhaseTimerText(village);
+  const timerSuffix = phaseTimerText ? ` ${phaseTimerText}` : '';
 
   message.textContent = isRunoff
-    ? 'Segunda votación: vota entre las personas empatadas o elige “No votar a nadie”. Solo se salvan si “No votar a nadie” consigue mayoría absoluta.'
-    : 'Vota a un habitante vivo o elige no votar a nadie. Puedes cambiar tu voto mientras la votación siga abierta.';
+    ? `Segunda votación: vota entre las personas empatadas o elige “No votar a nadie”. Solo se salvan si “No votar a nadie” consigue mayoría absoluta.${timerSuffix}`
+    : `Vota a un jugador vivo o elige no votar a nadie. Puedes cambiar tu voto mientras la votación siga abierta.${timerSuffix}`;
 
   const noVoteButton = document.createElement('button');
   noVoteButton.className = 'secondary-button night-target-button';
@@ -1476,6 +1541,7 @@ function renderVillageState(village) {
   renderPlayers('players-list', village.players);
   renderPublicPhaseState(village);
   updatePhaseButtons(village);
+  restartPhaseTimerInterval(village);
 
   if (currentUserRole === 'narrator') {
     updateNarratorButtons(village);
