@@ -597,6 +597,7 @@ function renderPublicPhaseState(village) {
   renderPlayerEliminatedPanel(village);
   renderVotingSummary(village);
   renderFinalResults(village);
+  renderResultsPage(village);
   renderPlayerVotingPanel(village);
 
   if (currentUserRole === 'narrator' && village.status === 'live') {
@@ -967,6 +968,118 @@ function renderFinalResults(village) {
     escapedKillersListId: 'player-final-escaped-killers-list',
     wronglyExpelledListId: 'player-final-wrongly-expelled-list',
   });
+}
+
+
+function getLatestCompletedReport(village) {
+  if (!village) {
+    return null;
+  }
+
+  return village.lastCompletedGameReport || (village.phase === 'finalResults' ? village.finalReport : null);
+}
+
+function getLatestCompletedClassification(village, report) {
+  if (!village) {
+    return null;
+  }
+
+  return (
+    village.lastCompletedClassificationSummary ||
+    report?.classificationSummary ||
+    (village.phase === 'finalResults' ? village.classificationSummary : null)
+  );
+}
+
+function buildResultsInsight(metrics = {}, confusion = {}) {
+  const accuracy = metrics.accuracy ?? 0;
+  const recall = metrics.recall ?? 0;
+  const precision = metrics.precision ?? 0;
+  const f1Score = metrics.f1Score ?? 0;
+  const escapedKillers = confusion.falseNegatives ?? 0;
+  const wronglyExpelledNeighbors = confusion.falsePositives ?? 0;
+
+  if (escapedKillers > 0 && accuracy > recall) {
+    return `La Accuracy puede sonar aceptable, pero el Recall revela el problema: ${escapedKillers} asesino(s) quedaron sin descubrir. Este es el tipo de caso donde mirar solo el porcentaje global de aciertos puede engañar.`;
+  }
+
+  if (wronglyExpelledNeighbors > 0 && precision < 1) {
+    return `La Precision muestra el coste de acusar mal: ${wronglyExpelledNeighbors} vecino(s) fueron expulsados por error. Cuando una falsa alarma es costosa, esta métrica se vuelve clave.`;
+  }
+
+  if (f1Score === 1) {
+    return 'El F1-Score es perfecto porque el pueblo detectó a todos los asesinos sin expulsar vecinos por error. No hubo falsos positivos ni falsos negativos.';
+  }
+
+  return 'El F1-Score resume el equilibrio entre descubrir asesinos y evitar acusaciones injustas. Cuanto más bajo sea, más débil fue ese equilibrio.';
+}
+
+function renderResultsPage(village) {
+  const emptyState = getElement('results-empty-state');
+  const reportPanel = getElement('results-report-panel');
+  const report = getLatestCompletedReport(village);
+  const classification = getLatestCompletedClassification(village, report);
+
+  if (!emptyState || !reportPanel) {
+    return;
+  }
+
+  if (!report || !classification) {
+    emptyState.hidden = false;
+    reportPanel.hidden = true;
+    return;
+  }
+
+  const summary = report.summary || {};
+  const groups = report.groups || {};
+  const confusion = classification.confusion || {};
+  const metrics = classification.metrics || {};
+  const aliveNeighborsCount = report.aliveNeighborsCount ?? report.aliveVillagersCount;
+
+  emptyState.hidden = true;
+  reportPanel.hidden = false;
+
+  setText('results-winner-title', report.winnerLabel || 'Partida finalizada');
+
+  const victoryReasonText = report.victoryReasonLabel
+    ? ` Motivo: ${report.victoryReasonLabel}`
+    : '';
+
+  const balanceText =
+    Number.isInteger(report.aliveKillersCount) && Number.isInteger(aliveNeighborsCount)
+      ? ` Balance final: ${report.aliveKillersCount} asesino(s) vivo(s) y ${aliveNeighborsCount} vecino(s) vivo(s).`
+      : '';
+
+  const summaryText = Number.isInteger(summary.totalPlayers)
+    ? ` Participaron ${summary.totalPlayers} jugador(es): ${summary.totalNeighbors} vecino(s) y ${summary.totalKillers} asesino(s).`
+    : '';
+
+  setText(
+    'results-summary-message',
+    `La partida se ha convertido en un problema de clasificación binaria.${victoryReasonText}${balanceText}${summaryText}`
+  );
+
+  setText('results-metric-accuracy', formatMetric(metrics.accuracy));
+  setText('results-metric-precision', formatMetric(metrics.precision));
+  setText('results-metric-recall', formatMetric(metrics.recall));
+  setText('results-metric-f1-score', formatMetric(metrics.f1Score));
+
+  setText('results-confusion-tp', confusion.truePositives ?? 0);
+  setText('results-confusion-fp', confusion.falsePositives ?? 0);
+  setText('results-confusion-tn', confusion.trueNegatives ?? 0);
+  setText('results-confusion-fn', confusion.falseNegatives ?? 0);
+
+  setText(
+    'results-classification-summary',
+    'Clase positiva: asesino. Clase negativa: vecino. Predicción positiva: jugador expulsado por votación. Realidad positiva: jugador que realmente tenía rol de asesino.'
+  );
+
+  setText('results-insight-message', buildResultsInsight(metrics, confusion));
+
+  renderFinalGroupList('results-discovered-killers-list', groups.discoveredKillers || [], 'No se descubrió a ningún asesino.');
+  renderFinalGroupList('results-escaped-killers-list', groups.escapedKillers || [], 'No escapó ningún asesino.');
+  renderFinalGroupList('results-wrongly-expelled-list', groups.wronglyExpelledVillagers || [], 'No se expulsó a ningún vecino por error.');
+  renderFinalGroupList('results-survivors-list', groups.survivors || [], 'No queda nadie con vida.');
 }
 
 

@@ -671,14 +671,99 @@
 
     <section class="view" data-view="/results">
       <p class="eyebrow">Datos de la partida</p>
-      <h2>Resultados</h2>
+      <h2>Informe de la última partida</h2>
       <p>
-        Aquí aparecerán la Confusion Matrix y las métricas calculadas a partir de las decisiones del pueblo.
+        Esta sección convierte la dinámica de El Pueblo Duerme en una Confusion Matrix real.
+        Cada expulsión por votación cuenta como una predicción positiva y cada rol real actúa como la verdad del dataset.
       </p>
 
-      <div class="placeholder-card">
-        <h3>Confusion Matrix + métricas</h3>
-        <p>Accuracy, Recall, Precision y F1-Score se mostrarán con los datos reales de la dinámica.</p>
+      <div id="results-empty-state" class="placeholder-card">
+        <h3>Todavía no hay una partida finalizada</h3>
+        <p>
+          Completa una partida y muestra los resultados finales para generar automáticamente el informe didáctico.
+        </p>
+      </div>
+
+      <div id="results-report-panel" class="night-summary-panel" hidden>
+        <h3 id="results-winner-title">Partida finalizada</h3>
+        <p id="results-summary-message"></p>
+
+        <div class="metrics-grid">
+          <article class="metric-card">
+            <span class="metric-label">Accuracy</span>
+            <strong id="results-metric-accuracy">--</strong>
+            <p>Aciertos globales sobre el total de jugadores.</p>
+          </article>
+
+          <article class="metric-card">
+            <span class="metric-label">Precision</span>
+            <strong id="results-metric-precision">--</strong>
+            <p>Fiabilidad del pueblo cuando acusa a alguien.</p>
+          </article>
+
+          <article class="metric-card">
+            <span class="metric-label">Recall</span>
+            <strong id="results-metric-recall">--</strong>
+            <p>Capacidad para descubrir a los asesinos reales.</p>
+          </article>
+
+          <article class="metric-card">
+            <span class="metric-label">F1-Score</span>
+            <strong id="results-metric-f1-score">--</strong>
+            <p>Equilibrio entre detectar asesinos y acusar con fiabilidad.</p>
+          </article>
+        </div>
+
+        <div class="placeholder-card">
+          <h3>Confusion Matrix</h3>
+          <p id="results-classification-summary"></p>
+
+          <dl class="settings-summary">
+            <div>
+              <dt>TP · Asesino expulsado</dt>
+              <dd id="results-confusion-tp">0</dd>
+            </div>
+            <div>
+              <dt>FP · Vecino expulsado por error</dt>
+              <dd id="results-confusion-fp">0</dd>
+            </div>
+            <div>
+              <dt>TN · Vecino no expulsado</dt>
+              <dd id="results-confusion-tn">0</dd>
+            </div>
+            <div>
+              <dt>FN · Asesino que escapó</dt>
+              <dd id="results-confusion-fn">0</dd>
+            </div>
+          </dl>
+        </div>
+
+        <div class="placeholder-card">
+          <h3>Lectura didáctica</h3>
+          <p id="results-insight-message"></p>
+        </div>
+
+        <div class="final-groups-grid">
+          <article>
+            <h3>Asesinos descubiertos</h3>
+            <ul id="results-discovered-killers-list" class="players-list"></ul>
+          </article>
+
+          <article>
+            <h3>Asesinos sin descubrir</h3>
+            <ul id="results-escaped-killers-list" class="players-list"></ul>
+          </article>
+
+          <article>
+            <h3>Vecinos expulsados por error</h3>
+            <ul id="results-wrongly-expelled-list" class="players-list"></ul>
+          </article>
+
+          <article>
+            <h3>Jugadores supervivientes</h3>
+            <ul id="results-survivors-list" class="players-list"></ul>
+          </article>
+        </div>
       </div>
     </section>
 
