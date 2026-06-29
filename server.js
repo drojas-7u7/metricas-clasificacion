@@ -8,6 +8,7 @@ const server = http.createServer(app);
 const io = new Server(server);
 
 const PORT = process.env.PORT || 3000;
+const HOST = process.env.HOST || '0.0.0.0';
 const PUBLIC_DIR = path.join(__dirname, 'public');
 const INDEX_FILE = path.join(PUBLIC_DIR, 'index.html');
 
@@ -2156,6 +2157,10 @@ io.on('connection', (socket) => {
   });
 });
 
-server.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+server.listen(PORT, HOST, () => {
+  const localUrl = `http://localhost:${PORT}`;
+  const networkUrl = `http://${HOST}:${PORT}`;
+
+  console.log(`Server running on ${localUrl}`);
+  console.log(`Network binding: ${networkUrl}`);
 });
