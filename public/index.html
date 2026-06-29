@@ -146,19 +146,19 @@
               Esta configuración se aplica cuando el pueblo ya está completo.
             </p>
 
+            <label class="form-field" for="rounds-count-input">
+              Número de rondas
+              <input id="rounds-count-input" type="number" min="1" max="10" value="3" />
+            </label>
+
             <label class="form-field" for="killers-count-input">
               Asesinos
-              <input id="killers-count-input" type="number" min="1" max="10" value="2" />
+              <input id="killers-count-input" type="number" min="1" max="10" value="1" />
             </label>
 
             <label class="form-field" for="discussion-time-input">
               Tiempo de discusión, en segundos
               <input id="discussion-time-input" type="number" min="15" max="600" step="15" value="120" />
-            </label>
-
-            <label class="form-field" for="killers-time-input">
-              Tiempo de los asesinos, en segundos
-              <input id="killers-time-input" type="number" min="10" max="300" step="5" value="30" />
             </label>
 
             <label class="form-field" for="voting-time-input">
@@ -199,16 +199,16 @@
                 <dd id="summary-status">Esperando habitantes</dd>
               </div>
               <div>
+                <dt>Rondas</dt>
+                <dd id="summary-rounds-count">3</dd>
+              </div>
+              <div>
                 <dt>Asesinos</dt>
-                <dd id="summary-killers-count">2</dd>
+                <dd id="summary-killers-count">1</dd>
               </div>
               <div>
                 <dt>Discusión</dt>
                 <dd id="summary-discussion-time">120 s</dd>
-              </div>
-              <div>
-                <dt>Tiempo asesinos</dt>
-                <dd id="summary-killers-time">30 s</dd>
               </div>
               <div>
                 <dt>Votación</dt>
@@ -266,16 +266,16 @@
               <dd id="waiting-status">Esperando habitantes</dd>
             </div>
             <div>
+              <dt>Rondas</dt>
+              <dd id="waiting-rounds-count">3</dd>
+            </div>
+            <div>
               <dt>Asesinos</dt>
-              <dd id="waiting-killers-count">2</dd>
+              <dd id="waiting-killers-count">1</dd>
             </div>
             <div>
               <dt>Discusión</dt>
               <dd id="waiting-discussion-time">120 s</dd>
-            </div>
-            <div>
-              <dt>Tiempo asesinos</dt>
-              <dd id="waiting-killers-time">30 s</dd>
             </div>
             <div>
               <dt>Votación</dt>
@@ -301,15 +301,199 @@
 
         <div class="game-board-layout">
           <aside class="narrator-tools">
-            <p class="eyebrow">Herramientas del narrador</p>
-            <h3>Panel de control</h3>
-            <p>Próximamente: noche, discusión, votación, acusaciones y cierre de ronda.</p>
+            <p class="eyebrow">Control de fases</p>
+            <h3>Panel público del narrador</h3>
+            <p>
+              Controla el ritmo de la partida sin revelar información secreta en pantalla.
+            </p>
+
+            <button id="start-night-button" class="primary-button" type="button">
+              Comenzar noche
+            </button>
+
+            <button id="end-night-button" class="secondary-button" type="button" disabled>
+              Cerrar noche
+            </button>
+
+            <button id="wake-village-button" class="secondary-button" type="button" disabled>
+              El pueblo se levanta
+            </button>
+
+            <button id="start-discussion-button" class="secondary-button" type="button" disabled>
+              Comenzar discusión
+            </button>
+
+            <button id="start-voting-button" class="secondary-button" type="button" disabled>
+              Comenzar votación
+            </button>
+
+            <button id="end-voting-button" class="secondary-button" type="button" disabled>
+              Cerrar votación
+            </button>
+
+            <button id="end-game-button" class="danger-button" type="button">
+              Acabar partida
+            </button>
+
+            <div id="phase-notice" class="notice-box" hidden></div>
+
           </aside>
 
           <section class="public-village-preview">
-            <p class="eyebrow">Estado del pueblo</p>
+            <p class="eyebrow">Estado público del pueblo</p>
             <h3 id="live-narrator-village-name">Pueblo activo</h3>
             <p id="live-narrator-status">La partida ha comenzado.</p>
+
+            <dl class="settings-summary">
+              <div>
+                <dt>Fase actual</dt>
+                <dd id="live-phase-label">Revelación de roles</dd>
+              </div>
+              <div>
+                <dt>Ronda</dt>
+                <dd id="live-round-label">Ronda 1 de --</dd>
+              </div>
+              <div>
+                <dt>Asesinos que han actuado</dt>
+                <dd id="night-actions-summary">0 / 0</dd>
+              </div>
+            </dl>
+
+            <section id="narrator-night-summary" class="night-summary-panel" hidden>
+              <p class="eyebrow">Resumen seguro de noche</p>
+              <h3>Noche cerrada</h3>
+
+              <div>
+                <h4>Acciones registradas</h4>
+                <ul id="narrator-night-actions-list" class="players-list"></ul>
+              </div>
+
+              <div>
+                <h4>Bajas calculadas</h4>
+                <ul id="narrator-night-casualties-list" class="players-list"></ul>
+              </div>
+
+              <div id="narrator-repeated-targets-block" hidden>
+                <h4>Objetivos repetidos</h4>
+                <ul id="narrator-repeated-targets-list" class="players-list"></ul>
+              </div>
+            </section>
+
+            <section id="voting-summary-panel" class="night-summary-panel" hidden>
+              <p class="eyebrow">Votación del pueblo</p>
+              <h3>Estado de votación</h3>
+              <p id="voting-progress-summary">Votos recibidos: 0 / 0.</p>
+              <p id="voting-no-vote-summary">No votos: 0.</p>
+
+              <div>
+                <h4>Votos emitidos</h4>
+                <ul id="public-votes-list" class="players-list"></ul>
+              </div>
+
+              <div>
+                <h4>Mayoría actual</h4>
+                <div id="voting-bars-list" class="vote-bars-list"></div>
+              </div>
+
+              <div id="voting-result-block" hidden>
+                <h4>Resultado</h4>
+                <p id="voting-result-message">La votación todavía no se ha cerrado.</p>
+                <ul id="voting-results-list" class="players-list"></ul>
+                <button id="start-runoff-voting-button" class="primary-button" type="button" hidden>
+                  Iniciar segunda votación
+                </button>
+                <button id="next-round-button" class="primary-button" type="button" hidden>
+                  Siguiente ronda
+                </button>
+                <button id="show-final-results-button" class="primary-button" type="button" hidden>
+                  Ver resultados finales
+                </button>
+              </div>
+            </section>
+
+            <section id="final-results-panel" class="night-summary-panel" hidden>
+              <p class="eyebrow">Resultados finales</p>
+              <h3>Partida finalizada</h3>
+              <p id="final-results-message">
+                La partida ha terminado. Revisa la matriz de confusión y las métricas finales.
+              </p>
+
+              <div class="metrics-grid">
+                <article class="metric-card">
+                  <span>Accuracy</span>
+                  <strong id="metric-accuracy">0.000</strong>
+                </article>
+                <article class="metric-card">
+                  <span>Precision</span>
+                  <strong id="metric-precision">0.000</strong>
+                </article>
+                <article class="metric-card">
+                  <span>Recall</span>
+                  <strong id="metric-recall">0.000</strong>
+                </article>
+                <article class="metric-card">
+                  <span>F1-Score</span>
+                  <strong id="metric-f1-score">0.000</strong>
+                </article>
+              </div>
+
+              <div class="confusion-matrix-panel">
+                <h4>Matriz de confusión</h4>
+                <div class="confusion-matrix-grid">
+                  <div></div>
+                  <div>Real: asesino</div>
+                  <div>Real: no asesino</div>
+                  <div>Predicción: asesino</div>
+                  <strong id="confusion-tp">0</strong>
+                  <strong id="confusion-fp">0</strong>
+                  <div>Predicción: no asesino</div>
+                  <strong id="confusion-fn">0</strong>
+                  <strong id="confusion-tn">0</strong>
+                </div>
+              </div>
+
+              <p id="classification-summary-message" class="notice-box">
+                Todavía no hay predicciones suficientes para calcular métricas.
+              </p>
+
+              <div class="final-groups-grid">
+                <article class="final-group-card">
+                  <h4>Supervivientes</h4>
+                  <ul id="final-survivors-list" class="players-list"></ul>
+                </article>
+
+                <article class="final-group-card">
+                  <h4>Vecinos asesinados por los asesinos</h4>
+                  <ul id="final-killed-list" class="players-list"></ul>
+                </article>
+
+                <article class="final-group-card">
+                  <h4>Expulsados por el pueblo</h4>
+                  <ul id="final-expelled-list" class="players-list"></ul>
+                </article>
+
+                <article class="final-group-card">
+                  <h4>Asesinos descubiertos</h4>
+                  <ul id="final-discovered-killers-list" class="players-list"></ul>
+                </article>
+
+                <article class="final-group-card">
+                  <h4>Asesinos que escaparon</h4>
+                  <ul id="final-escaped-killers-list" class="players-list"></ul>
+                </article>
+
+                <article class="final-group-card">
+                  <h4>Vecinos expulsados por error</h4>
+                  <ul id="final-wrongly-expelled-list" class="players-list"></ul>
+                </article>
+              </div>
+            </section>
+
+            <section id="public-night-result-panel" class="night-summary-panel" hidden>
+              <p class="eyebrow">Bajas de la noche</p>
+              <h3>Resultado público</h3>
+              <ul id="public-night-casualties-list" class="players-list"></ul>
+            </section>
           </section>
         </div>
       </div>
@@ -325,6 +509,25 @@
           <p class="eyebrow">Tu vista privada</p>
           <h3 id="private-player-title">Información del jugador</h3>
 
+          <dl class="settings-summary">
+            <div>
+              <dt>Ronda</dt>
+              <dd id="player-live-round-label">Ronda 1 de --</dd>
+            </div>
+            <div>
+              <dt>Fase actual</dt>
+              <dd id="player-live-phase-label">Revelación de roles</dd>
+            </div>
+          </dl>
+
+          <section id="player-eliminated-panel" class="private-night-panel eliminated-player-panel" hidden>
+            <p class="eyebrow">Estado del jugador</p>
+            <h3>Has sido eliminado</h3>
+            <p id="player-eliminated-message">
+              Puedes observar la partida, pero ya no puedes actuar ni votar.
+            </p>
+          </section>
+
           <p id="private-role-placeholder">
             Tu rol aparecerá aquí cuando el narrador comience la partida.
           </p>
@@ -339,6 +542,128 @@
             <p id="private-role-description">
               Espera a que el servidor asigne los roles.
             </p>
+          </div>
+
+          <section id="player-final-results-panel" class="night-summary-panel" hidden>
+            <p class="eyebrow">Resultados finales</p>
+            <h3>Partida finalizada</h3>
+            <p id="player-final-results-message">
+              La partida ha terminado. Revisa la matriz de confusión y las métricas finales.
+            </p>
+
+            <div class="metrics-grid">
+              <article class="metric-card">
+                <span>Accuracy</span>
+                <strong id="player-metric-accuracy">0.000</strong>
+              </article>
+              <article class="metric-card">
+                <span>Precision</span>
+                <strong id="player-metric-precision">0.000</strong>
+              </article>
+              <article class="metric-card">
+                <span>Recall</span>
+                <strong id="player-metric-recall">0.000</strong>
+              </article>
+              <article class="metric-card">
+                <span>F1-Score</span>
+                <strong id="player-metric-f1-score">0.000</strong>
+              </article>
+            </div>
+
+            <div class="confusion-matrix-panel">
+              <h4>Matriz de confusión</h4>
+              <div class="confusion-matrix-grid">
+                <div></div>
+                <div>Real: asesino</div>
+                <div>Real: no asesino</div>
+                <div>Predicción: asesino</div>
+                <strong id="player-confusion-tp">0</strong>
+                <strong id="player-confusion-fp">0</strong>
+                <div>Predicción: no asesino</div>
+                <strong id="player-confusion-fn">0</strong>
+                <strong id="player-confusion-tn">0</strong>
+              </div>
+            </div>
+
+            <p id="player-classification-summary-message" class="notice-box">
+              Todavía no hay datos suficientes para calcular métricas finales.
+            </p>
+
+            <div class="final-groups-grid">
+              <article class="final-group-card">
+                <h4>Supervivientes</h4>
+                <ul id="player-final-survivors-list" class="players-list"></ul>
+              </article>
+
+              <article class="final-group-card">
+                <h4>Vecinos asesinados por los asesinos</h4>
+                <ul id="player-final-killed-list" class="players-list"></ul>
+              </article>
+
+              <article class="final-group-card">
+                <h4>Expulsados por el pueblo</h4>
+                <ul id="player-final-expelled-list" class="players-list"></ul>
+              </article>
+
+              <article class="final-group-card">
+                <h4>Asesinos descubiertos</h4>
+                <ul id="player-final-discovered-killers-list" class="players-list"></ul>
+              </article>
+
+              <article class="final-group-card">
+                <h4>Asesinos que escaparon</h4>
+                <ul id="player-final-escaped-killers-list" class="players-list"></ul>
+              </article>
+
+              <article class="final-group-card">
+                <h4>Vecinos expulsados por error</h4>
+                <ul id="player-final-wrongly-expelled-list" class="players-list"></ul>
+              </article>
+            </div>
+          </section>
+
+          <section id="player-public-night-result-panel" class="night-summary-panel" hidden>
+            <p class="eyebrow">Bajas de la noche</p>
+            <h3>Resultado público</h3>
+            <ul id="player-public-night-casualties-list" class="players-list"></ul>
+          </section>
+
+          <section id="player-voting-panel" class="private-night-panel" hidden>
+            <p class="eyebrow">Votación</p>
+            <h3>Elige a quién expulsar</h3>
+            <p id="player-voting-message">
+              Cuando el narrador abra la votación, aquí aparecerán los habitantes vivos.
+            </p>
+            <p id="player-vote-feedback" class="notice-box" hidden></p>
+            <div id="player-voting-targets-list" class="night-targets-list"></div>
+
+            <div>
+              <h4>Votos emitidos</h4>
+              <ul id="player-public-votes-list" class="players-list"></ul>
+            </div>
+
+            <div>
+              <h4>Mayoría actual</h4>
+              <div id="player-voting-bars-list" class="vote-bars-list"></div>
+            </div>
+          </section>
+
+          <div id="private-night-panel" class="private-night-panel" hidden>
+            <p class="eyebrow">Acción nocturna</p>
+            <h3 id="private-night-title">Esperando fase de noche</h3>
+            <p id="private-night-message">
+              Cuando llegue la noche, aquí aparecerá si tienes alguna acción disponible.
+            </p>
+
+            <div id="killer-teammates-container" hidden>
+              <h3>Otros asesinos</h3>
+              <ul id="killer-teammates-list" class="players-list"></ul>
+            </div>
+
+            <div id="night-targets-container" hidden>
+              <h3>Elige una víctima</h3>
+              <div id="night-targets-list" class="night-targets-list"></div>
+            </div>
           </div>
         </section>
       </div>

@@ -709,3 +709,240 @@ button:disabled:hover {
     font-size: 1rem;
   }
 }
+
+/* Night phase */
+
+.private-night-panel {
+  margin-top: 1.5rem;
+  padding: 1.4rem;
+  background: rgba(15, 23, 42, 0.76);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 1.25rem;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.2);
+}
+
+.private-night-panel p {
+  color: var(--color-muted);
+}
+
+.night-targets-list {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.night-target-button {
+  width: 100%;
+  justify-content: space-between;
+  border-radius: 1rem;
+  padding: 1rem;
+}
+
+.night-target-button.selected {
+  border-color: rgba(249, 115, 22, 0.8);
+  background: rgba(249, 115, 22, 0.22);
+}
+
+.night-target-button span {
+  font-weight: 900;
+}
+
+.night-target-button small {
+  color: var(--color-muted);
+  font-weight: 700;
+}
+
+/* Phase summaries */
+
+.night-summary-panel {
+  margin-top: 1.25rem;
+  padding: 1.25rem;
+  background: rgba(15, 23, 42, 0.72);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 1.25rem;
+}
+
+.night-summary-panel h3,
+.night-summary-panel h4 {
+  margin-bottom: 0.75rem;
+}
+
+.night-summary-panel h4 {
+  margin-top: 1rem;
+  font-size: 0.95rem;
+  color: var(--color-text);
+}
+
+.night-summary-panel .players-list {
+  margin-top: 0.5rem;
+}
+
+.night-summary-panel .players-list li {
+  padding: 0.75rem 0.85rem;
+  background: rgba(15, 23, 42, 0.55);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 0.85rem;
+}
+
+.danger-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0.8rem 1.2rem;
+  border: 1px solid rgba(248, 113, 113, 0.65);
+  border-radius: 999px;
+  background: rgba(127, 29, 29, 0.25);
+  color: #fecaca;
+  font-weight: 900;
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.danger-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: rgba(248, 113, 113, 0.95);
+  background: rgba(127, 29, 29, 0.38);
+}
+
+.danger-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+
+.player-list-item.is-eliminated {
+  opacity: 0.65;
+  text-decoration: line-through;
+}
+
+.eliminated-player-panel {
+  border: 1px solid rgba(160, 45, 45, 0.45);
+}
+
+
+.night-target-button.is-selected {
+  border-color: rgba(94, 125, 255, 0.95);
+  box-shadow: 0 0 0 3px rgba(94, 125, 255, 0.18);
+  transform: translateY(-1px);
+}
+
+.night-target-button.is-selected small {
+  font-weight: 700;
+}
+
+.vote-bars-list {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.vote-bar-row {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.vote-bar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.92rem;
+}
+
+.vote-bar-header strong {
+  white-space: nowrap;
+}
+
+.vote-bar-track {
+  min-height: 0.65rem;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.vote-bar-fill {
+  height: 100%;
+  min-width: 0.25rem;
+  border-radius: inherit;
+  background: currentColor;
+}
+
+.vote-bar-row.is-no-vote {
+  opacity: 0.78;
+}
+
+
+.player-list-item.is-current-player {
+  border-color: rgba(94, 125, 255, 0.85);
+  box-shadow: 0 0 0 3px rgba(94, 125, 255, 0.14);
+}
+
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+
+.metric-card {
+  padding: 0.9rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.metric-card span {
+  display: block;
+  font-size: 0.78rem;
+  opacity: 0.78;
+  margin-bottom: 0.35rem;
+}
+
+.metric-card strong {
+  display: block;
+  font-size: 1.35rem;
+}
+
+.confusion-matrix-panel {
+  margin: 1rem 0;
+}
+
+.confusion-matrix-grid {
+  display: grid;
+  grid-template-columns: 1.2fr repeat(2, minmax(5rem, 1fr));
+  gap: 0.35rem;
+  align-items: stretch;
+}
+
+.confusion-matrix-grid > * {
+  padding: 0.65rem;
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.06);
+  text-align: center;
+}
+
+.confusion-matrix-grid strong {
+  font-size: 1.2rem;
+}
+
+
+.final-groups-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 0.85rem;
+  margin-top: 1rem;
+}
+
+.final-group-card {
+  padding: 0.9rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.final-group-card h4 {
+  margin-top: 0;
+  margin-bottom: 0.65rem;
+}
