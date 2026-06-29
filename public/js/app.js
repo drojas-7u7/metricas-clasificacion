@@ -598,6 +598,7 @@ function renderPublicPhaseState(village) {
   renderVotingSummary(village);
   renderFinalResults(village);
   renderResultsPage(village);
+  renderDefinitionsPage(village);
   renderPlayerVotingPanel(village);
 
   if (currentUserRole === 'narrator' && village.status === 'live') {
@@ -1080,6 +1081,136 @@ function renderResultsPage(village) {
   renderFinalGroupList('results-escaped-killers-list', groups.escapedKillers || [], 'No escapó ningún asesino.');
   renderFinalGroupList('results-wrongly-expelled-list', groups.wronglyExpelledVillagers || [], 'No se expulsó a ningún vecino por error.');
   renderFinalGroupList('results-survivors-list', groups.survivors || [], 'No queda nadie con vida.');
+}
+
+
+function renderDefinitionsPage(village) {
+  const emptyState = getElement('definitions-game-example-empty');
+  const dynamicPanel = getElement('definitions-game-example-panel');
+  const report = getLatestCompletedReport(village);
+  const classification = getLatestCompletedClassification(village, report);
+
+  if (!emptyState || !dynamicPanel) {
+    return;
+  }
+
+  if (!classification) {
+    emptyState.hidden = false;
+    dynamicPanel.hidden = true;
+
+    setText('definitions-accuracy', '--');
+    setText('definitions-precision', '--');
+    setText('definitions-recall', '--');
+    setText('definitions-f1-score', '--');
+    return;
+  }
+
+  const confusion = classification.confusion || {};
+  const metrics = classification.metrics || {};
+  const totalEvents = classification.totalEvents || 0;
+
+  emptyState.hidden = true;
+  dynamicPanel.hidden = false;
+
+  setText(
+    'definitions-game-summary',
+    `En la última partida se evaluaron ${totalEvents} jugador(es). Cada jugador cuenta una vez al final: expulsado por votación significa “predicho como asesino”; tener rol asesino significa “realmente positivo”.`
+  );
+
+  setText('definitions-tp', confusion.truePositives ?? 0);
+  setText('definitions-fp', confusion.falsePositives ?? 0);
+  setText('definitions-tn', confusion.trueNegatives ?? 0);
+  setText('definitions-fn', confusion.falseNegatives ?? 0);
+
+  setText('definitions-accuracy', formatMetric(metrics.accuracy));
+  setText('definitions-precision', formatMetric(metrics.precision));
+  setText('definitions-recall', formatMetric(metrics.recall));
+  setText('definitions-f1-score', formatMetric(metrics.f1Score));
+
+  setText(
+    'definitions-accuracy-dynamic',
+    `En vuestra partida, la Accuracy mide cuántos jugadores quedaron correctamente clasificados como acierto global.`
+  );
+  setText(
+    'definitions-recall-dynamic',
+    `En vuestra partida, el Recall mide cuántos asesinos reales consiguió descubrir el pueblo.`
+  );
+  setText(
+    'definitions-precision-dynamic',
+    `En vuestra partida, la Precision mide si las expulsiones del pueblo fueron fiables.`
+  );
+  setText(
+    'definitions-f1-dynamic',
+    `En vuestra partida, el F1-Score resume el equilibrio entre descubrir asesinos y no expulsar vecinos por error.`
+  );
+}
+
+function getSimulatorInputValue(inputId) {
+  const value = Number(getElement(inputId)?.value);
+
+  if (!Number.isFinite(value) || value < 0) {
+    return 0;
+  }
+
+  return Math.round(value);
+}
+
+function calculateMetricsFromConfusion({ truePositives, falsePositives, trueNegatives, falseNegatives }) {
+  const total = truePositives + falsePositives + trueNegatives + falseNegatives;
+  const accuracy = total > 0 ? (truePositives + trueNegatives) / total : 0;
+  const precisionDenominator = truePositives + falsePositives;
+  const recallDenominator = truePositives + falseNegatives;
+  const precision = precisionDenominator > 0 ? truePositives / precisionDenominator : 0;
+  const recall = recallDenominator > 0 ? truePositives / recallDenominator : 0;
+  const f1Denominator = precision + recall;
+  const f1Score = f1Denominator > 0 ? (2 * precision * recall) / f1Denominator : 0;
+
+  return {
+    accuracy,
+    precision,
+    recall,
+    f1Score,
+  };
+}
+
+function renderSimulatorPage() {
+  const confusion = {
+    truePositives: getSimulatorInputValue('simulator-tp-input'),
+    falsePositives: getSimulatorInputValue('simulator-fp-input'),
+    trueNegatives: getSimulatorInputValue('simulator-tn-input'),
+    falseNegatives: getSimulatorInputValue('simulator-fn-input'),
+  };
+
+  const metrics = calculateMetricsFromConfusion(confusion);
+
+  setText('simulator-accuracy', formatMetric(metrics.accuracy));
+  setText('simulator-precision', formatMetric(metrics.precision));
+  setText('simulator-recall', formatMetric(metrics.recall));
+  setText('simulator-f1-score', formatMetric(metrics.f1Score));
+
+  const insight =
+    confusion.falseNegatives > 0 && metrics.accuracy > metrics.recall
+      ? 'La Accuracy puede parecer buena aunque el Recall sea bajo. Eso significa que se están escapando positivos reales.'
+      : 'Observa cómo cambian Precision y Recall cuando aumentas falsos positivos o falsos negativos.';
+
+  setText('simulator-insight', insight);
+}
+
+function setupSimulatorControls() {
+  [
+    'simulator-tp-input',
+    'simulator-fp-input',
+    'simulator-tn-input',
+    'simulator-fn-input',
+  ].forEach((inputId) => {
+    const input = getElement(inputId);
+
+    if (input) {
+      input.addEventListener('input', renderSimulatorPage);
+    }
+  });
+
+  renderSimulatorPage();
 }
 
 
@@ -2089,3 +2220,5 @@ document.addEventListener('DOMContentLoaded', () => {
   renderView(window.location.pathname, false);
   showGameScreen('game-entry-screen');
 });
+
+setupSimulatorControls();

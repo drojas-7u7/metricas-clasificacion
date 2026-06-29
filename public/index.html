@@ -771,50 +771,440 @@
       <p class="eyebrow">Parte didáctica</p>
       <h2>Definiciones</h2>
       <p>
-        Explicación de Accuracy, Recall, Precision y F1-Score. Si existe una partida previa, usaremos sus datos como ejemplo.
+        Las métricas de clasificación no sirven solo para decir si un modelo acierta mucho.
+        Sirven para entender en qué se equivoca, qué tipo de error comete y si ese error importa.
       </p>
 
       <div class="placeholder-card">
-        <h3>Contenido de la enciclopedia</h3>
-        <p>Este bloque se alimentará de la explicación didáctica ya preparada.</p>
+        <h3>Contexto histórico</h3>
+        <p>
+          Las métricas de clasificación no nacieron con el machine learning. Tienen raíces en la teoría de la detección
+          de señales, desarrollada durante la Segunda Guerra Mundial para distinguir entre ruido y señales reales en radar
+          y sonar.
+        </p>
+        <p>
+          En los años 50 y 60, estos conceptos migraron a la medicina diagnóstica, donde se necesitaba medir la fiabilidad
+          de pruebas clínicas. Los médicos hablaban de sensibilidad, lo que hoy llamamos Recall, y especificidad, relacionada
+          con la tasa de verdaderos negativos.
+        </p>
+        <p>
+          Con el auge del machine learning en los años 90 y 2000, estas métricas se estandarizaron como lenguaje común
+          para evaluar modelos de clasificación.
+        </p>
+        <p>
+          Mensaje clave: esto no es una invención reciente. Es una tradición científica de décadas para medir la fiabilidad
+          de sistemas que toman decisiones binarias.
+        </p>
+      </div>
+
+      <div class="placeholder-card">
+        <h3>Confusion Matrix</h3>
+        <p>
+          La Confusion Matrix, o matriz de confusión, es una tabla de cuatro casillas que permite visualizar el rendimiento
+          de un algoritmo de clasificación supervisada. Cada fila representa la clase real y cada columna representa la clase
+          predicha por el modelo.
+        </p>
+        <p>
+          Dicho de forma sencilla: cuenta cuántas veces el modelo acertó y se equivocó, y de qué tipo de error se trata.
+        </p>
+
+        <dl class="settings-summary">
+          <div>
+            <dt>True Positive · TP</dt>
+            <dd>Acierto: detecté un positivo real.</dd>
+          </div>
+          <div>
+            <dt>False Positive · FP</dt>
+            <dd>Error: dije “sí”, pero era “no”. Es una falsa alarma.</dd>
+          </div>
+          <div>
+            <dt>True Negative · TN</dt>
+            <dd>Acierto: descarté correctamente un negativo.</dd>
+          </div>
+          <div>
+            <dt>False Negative · FN</dt>
+            <dd>Error: dije “no”, pero era “sí”. No detecté lo importante.</dd>
+          </div>
+        </dl>
+
+        <p>
+          Memotecnia: la primera palabra indica si el modelo acertó. True significa que sí; False significa que no.
+          La segunda palabra indica qué predijo el modelo. Positive significa que dijo “positivo”; Negative significa que dijo “negativo”.
+        </p>
+      </div>
+
+      <div id="definitions-game-example-empty" class="placeholder-card">
+        <h3>Aplicación a El Pueblo Duerme</h3>
+        <p>
+          Juega la dinámica y muestra los resultados finales para ver aquí cómo se transforma vuestra partida real
+          en TP, FP, TN y FN.
+        </p>
+      </div>
+
+      <div id="definitions-game-example-panel" class="night-summary-panel" hidden>
+        <h3>Aplicación a El Pueblo Duerme con la última partida</h3>
+        <p id="definitions-game-summary"></p>
+
+        <dl class="settings-summary">
+          <div>
+            <dt>TP · Asesino expulsado por votación</dt>
+            <dd id="definitions-tp">0</dd>
+          </div>
+          <div>
+            <dt>FP · Vecino expulsado por error</dt>
+            <dd id="definitions-fp">0</dd>
+          </div>
+          <div>
+            <dt>TN · Vecino no expulsado</dt>
+            <dd id="definitions-tn">0</dd>
+          </div>
+          <div>
+            <dt>FN · Asesino que escapó</dt>
+            <dd id="definitions-fn">0</dd>
+          </div>
+        </dl>
+      </div>
+
+      <div class="metrics-grid">
+        <article class="metric-card">
+          <span class="metric-label">Accuracy</span>
+          <strong id="definitions-accuracy">--</strong>
+          <p>
+            La Accuracy es la proporción de instancias correctamente clasificadas sobre el total.
+            Responde a la pregunta: de todas las decisiones, ¿cuántas acertó el modelo?
+          </p>
+          <p>
+            Fórmula: (TP + TN) / (TP + TN + FP + FN).
+          </p>
+          <p id="definitions-accuracy-dynamic">
+            Cuando juegues una partida, aquí aparecerá la interpretación con vuestros datos.
+          </p>
+        </article>
+
+        <article class="metric-card">
+          <span class="metric-label">Recall</span>
+          <strong id="definitions-recall">--</strong>
+          <p>
+            El Recall mide la proporción de positivos reales que fueron correctamente identificados.
+            Responde a la pregunta: de todos los casos importantes que existían, ¿cuántos detecté?
+          </p>
+          <p>
+            Fórmula: TP / (TP + FN).
+          </p>
+          <p>
+            Importa especialmente cuando el coste de no detectar algo es alto: medicina, fraude, seguridad o riesgos críticos.
+          </p>
+          <p id="definitions-recall-dynamic">
+            Cuando juegues una partida, aquí aparecerá cuántos asesinos reales consiguió descubrir el pueblo.
+          </p>
+        </article>
+
+        <article class="metric-card">
+          <span class="metric-label">Precision</span>
+          <strong id="definitions-precision">--</strong>
+          <p>
+            La Precision mide la proporción de predicciones positivas que fueron correctas.
+            Responde a la pregunta: cuando el modelo dice “sí”, ¿cuántas veces acierta?
+          </p>
+          <p>
+            Fórmula: TP / (TP + FP).
+          </p>
+          <p>
+            Importa cuando una falsa alarma tiene coste: bloquear una tarjeta legítima, tratar a una persona sana o acusar a un inocente.
+          </p>
+          <p id="definitions-precision-dynamic">
+            Cuando juegues una partida, aquí aparecerá si el pueblo fue fiable al expulsar jugadores.
+          </p>
+        </article>
+
+        <article class="metric-card">
+          <span class="metric-label">F1-Score</span>
+          <strong id="definitions-f1-score">--</strong>
+          <p>
+            El F1-Score es la media armónica entre Precision y Recall. Penaliza los valores extremos:
+            si una de las dos métricas es muy baja, el F1 cae.
+          </p>
+          <p>
+            Fórmula: 2 × (Precision × Recall) / (Precision + Recall).
+          </p>
+          <p>
+            Sirve para resumir el equilibrio entre detectar lo importante y ser fiable cuando se acusa.
+          </p>
+          <p id="definitions-f1-dynamic">
+            Cuando juegues una partida, aquí aparecerá el equilibrio real entre encontrar asesinos y no expulsar vecinos por error.
+          </p>
+        </article>
+      </div>
+
+      <div class="placeholder-card">
+        <h3>El dilema: Recall vs Precision</h3>
+        <p>
+          Normalmente no puedes maximizar ambas a la vez solo moviendo el umbral de decisión. Si el modelo es muy estricto,
+          sube la Precision, pero baja el Recall porque deja escapar positivos reales. Si el modelo es muy permisivo,
+          sube el Recall, pero baja la Precision porque genera más falsas alarmas.
+        </p>
+        <p>
+          Sí pueden subir ambas métricas si mejoras el modelo de verdad: mejores datos, mejor algoritmo, menos ruido o mejor representación
+          del problema.
+        </p>
+      </div>
+
+      <div class="placeholder-card">
+        <h3>Valores óptimos y rangos de interpretación</h3>
+        <dl class="settings-summary">
+          <div>
+            <dt>Accuracy</dt>
+            <dd>Puede sonar bien por encima de 0,9, pero puede engañar si las clases están desbalanceadas.</dd>
+          </div>
+          <div>
+            <dt>Recall</dt>
+            <dd>1,0 significa que se detectaron todos los positivos reales. 0 significa que no se detectó ninguno.</dd>
+          </div>
+          <div>
+            <dt>Precision</dt>
+            <dd>1,0 significa que cada vez que el modelo dijo “positivo”, acertó. 0 significa que todas sus alertas fueron falsas.</dd>
+          </div>
+          <div>
+            <dt>F1-Score</dt>
+            <dd>1,0 exige Precision y Recall perfectos. Si una de las dos cae a 0, el F1 también cae a 0.</dd>
+          </div>
+        </dl>
+        <p>
+          No existe un valor óptimo universal. La pregunta correcta no es “¿mi F1 es alto?”, sino:
+          “¿este F1, con esta Precision y este Recall, es adecuado para el problema que estoy resolviendo?”.
+        </p>
+      </div>
+
+      <div class="placeholder-card">
+        <h3>¿Cuándo usar cada métrica?</h3>
+        <dl class="settings-summary">
+          <div>
+            <dt>Clases equilibradas y errores parecidos</dt>
+            <dd>Accuracy puede ser suficiente.</dd>
+          </div>
+          <div>
+            <dt>No detectar algo es grave</dt>
+            <dd>Recall debe tener prioridad.</dd>
+          </div>
+          <div>
+            <dt>Las falsas alarmas son costosas</dt>
+            <dd>Precision debe tener prioridad.</dd>
+          </div>
+          <div>
+            <dt>Necesitas equilibrio</dt>
+            <dd>F1-Score ayuda a comparar modelos sin mirar solo una métrica.</dd>
+          </div>
+        </dl>
       </div>
     </section>
 
     <section class="view" data-view="/cases">
       <p class="eyebrow">Aplicación profesional</p>
-      <h2>Casos Reales</h2>
+      <h2>Casos reales</h2>
       <p>
-        Ejemplos de medicina, fraude bancario y spam para entender que las métricas no son solo números.
+        Las métricas no son números decorativos para un informe. Son decisiones que afectan a personas, recursos,
+        costes y riesgos reales.
       </p>
 
       <div class="placeholder-card">
-        <h3>Casos de uso</h3>
-        <p>Más adelante convertiremos cada caso en una tarjeta clara y profesional.</p>
+        <h3>Caso 1: Detección de cáncer de mama con IA</h3>
+        <p>
+          En medicina, el coste de un falso negativo puede ser muy alto. Si un sistema no detecta un cáncer real,
+          el paciente puede perder tiempo crítico para el diagnóstico y tratamiento.
+        </p>
+        <p>
+          Por eso, en muchos contextos médicos se prioriza el Recall: interesa detectar la mayor cantidad posible de casos positivos reales.
+          Un falso positivo puede generar ansiedad o pruebas adicionales, pero un falso negativo puede ser mucho más peligroso.
+        </p>
+        <p>
+          La lección es que elegir la métrica correcta no es solo técnico. Es ético y práctico.
+        </p>
+      </div>
+
+      <div class="placeholder-card">
+        <h3>Caso 2: Detección de fraude bancario</h3>
+        <p>
+          Un banco puede usar un modelo de clasificación para detectar transacciones fraudulentas.
+        </p>
+        <p>
+          Si prioriza mucho el Recall, detectará casi todos los fraudes, pero bloqueará también muchas operaciones legítimas.
+          Eso provoca llamadas al servicio de atención al cliente, frustración y pérdida de confianza.
+        </p>
+        <p>
+          Si prioriza mucho la Precision, solo bloqueará cuando esté muy seguro, pero se le pueden colar fraudes reales.
+        </p>
+        <p>
+          En la práctica, muchos sistemas usan bandas de riesgo: bloqueo automático para riesgo alto, verificación adicional para riesgo medio
+          y paso directo para riesgo bajo.
+        </p>
+      </div>
+
+      <div class="placeholder-card">
+        <h3>Caso 3: Filtro de spam</h3>
+        <p>
+          Un filtro de spam decide si un mensaje debe llegar a la bandeja de entrada o quedarse en spam.
+        </p>
+        <p>
+          Si prioriza demasiado el Recall, casi no se cuela spam, pero también puede ocultar correos importantes:
+          facturas, invitaciones, recordatorios médicos o mensajes de trabajo.
+        </p>
+        <p>
+          Si prioriza demasiado la Precision, marcará como spam solo lo muy evidente, pero la bandeja se llenará de publicidad.
+        </p>
+        <p>
+          Por eso muchos filtros combinan varios modelos, reglas y aprendizaje del comportamiento del usuario.
+        </p>
+      </div>
+
+      <div class="placeholder-card">
+        <h3>Mensaje central</h3>
+        <p>
+          Recall bajo en medicina puede significar vidas perdidas. Precision baja en banca puede significar clientes bloqueados injustamente.
+          Un mal equilibrio en spam puede significar pérdida de productividad.
+        </p>
+        <p>
+          El científico de datos no solo elige un modelo. Elige qué tipo de error es aceptable y para quién.
+        </p>
       </div>
     </section>
 
     <section class="view" data-view="/debate">
       <p class="eyebrow">Reflexión ética</p>
       <h2>Debate</h2>
-      <p class="debate-question">
-        Un modelo de predicción de incendios forestales tiene F1 del 72% a nivel nacional. En Galicia es 85% y en Extremadura 38%. ¿Es ético desplegarlo?
+      <p>
+        Hemos visto que F1 resume el equilibrio de un modelo. Pero un F1 global puede esconder diferencias importantes
+        entre regiones, grupos o poblaciones.
       </p>
 
-      <button class="secondary-button" type="button">
-        Ver pista
-      </button>
+      <div class="placeholder-card">
+        <h3>Pregunta elegida</h3>
+        <p class="debate-question">
+          Un modelo de predicción de riesgo de incendios forestales tiene F1 del 72% a nivel nacional.
+          Al desglosar por regiones, en Galicia es del 85% y en Extremadura del 38%.
+          ¿Es ético desplegarlo nacionalmente?
+        </p>
+      </div>
+
+      <div class="placeholder-card">
+        <h3>Por qué esta pregunta funciona</h3>
+        <p>
+          Un F1 global del 72% no es perfecto, pero puede parecer razonable. El problema aparece al mirar por regiones:
+          el modelo funciona muy bien en Galicia y muy mal en Extremadura.
+        </p>
+        <p>
+          La pregunta ya no es solo si el modelo funciona técnicamente. La pregunta es si es justo desplegar un sistema
+          que protege mejor a unos territorios que a otros.
+        </p>
+      </div>
+
+      <div class="metrics-grid">
+        <article class="metric-card">
+          <span class="metric-label">Posición 1</span>
+          <strong>Sí, desplegar</strong>
+          <p>
+            El modelo puede ser mejor que no tener nada. Aunque falle en algunas zonas, podría ayudar a prevenir parte del riesgo.
+          </p>
+        </article>
+
+        <article class="metric-card">
+          <span class="metric-label">Posición 2</span>
+          <strong>No, esperar</strong>
+          <p>
+            Un F1 del 38% en Extremadura puede ser inaceptable. Desplegarlo podría dejar peor protegida a una región concreta.
+          </p>
+        </article>
+
+        <article class="metric-card">
+          <span class="metric-label">Posición 3</span>
+          <strong>Depende</strong>
+          <p>
+            Depende del uso: si es apoyo para humanos, si se avisa de la baja fiabilidad regional y si existen medidas compensatorias.
+          </p>
+        </article>
+
+        <article class="metric-card">
+          <span class="metric-label">Posición 4</span>
+          <strong>Desplegar con advertencia</strong>
+          <p>
+            Se podría usar el modelo indicando explícitamente que en Extremadura su fiabilidad es baja y requiere revisión humana.
+          </p>
+        </article>
+      </div>
+
+      <details class="placeholder-card">
+        <summary>Guía para moderar</summary>
+        <p>
+          Da unos segundos para pensar. Pide una votación rápida: sí, no o depende. Después pide uno o dos argumentos.
+          No hace falta cerrar con una respuesta única. El objetivo es que el grupo entienda que una métrica global puede ocultar daños locales.
+        </p>
+      </details>
     </section>
 
     <section class="view" data-view="/simulator">
       <p class="eyebrow">Herramienta libre</p>
       <h2>Simulador</h2>
       <p>
-        Experimenta con valores de TP, TN, FP y FN para observar cómo cambian las métricas.
+        Experimenta con valores de TP, TN, FP y FN para observar cómo cambian Accuracy, Precision, Recall y F1-Score.
+        Este bloque permite entender las métricas sin tener que repetir una partida completa.
       </p>
 
       <div class="placeholder-card">
-        <h3>Simulador de métricas</h3>
-        <p>Primero construiremos el cálculo simple. Después añadiremos el slider de umbral.</p>
+        <h3>Valores de la Confusion Matrix</h3>
+
+        <div class="settings-grid">
+          <label class="form-field" for="simulator-tp-input">
+            True Positives
+            <input id="simulator-tp-input" type="number" min="0" step="1" value="1" />
+          </label>
+
+          <label class="form-field" for="simulator-fp-input">
+            False Positives
+            <input id="simulator-fp-input" type="number" min="0" step="1" value="1" />
+          </label>
+
+          <label class="form-field" for="simulator-tn-input">
+            True Negatives
+            <input id="simulator-tn-input" type="number" min="0" step="1" value="19" />
+          </label>
+
+          <label class="form-field" for="simulator-fn-input">
+            False Negatives
+            <input id="simulator-fn-input" type="number" min="0" step="1" value="2" />
+          </label>
+        </div>
+      </div>
+
+      <div class="metrics-grid">
+        <article class="metric-card">
+          <span class="metric-label">Accuracy</span>
+          <strong id="simulator-accuracy">--</strong>
+          <p>Aciertos globales sobre el total.</p>
+        </article>
+
+        <article class="metric-card">
+          <span class="metric-label">Precision</span>
+          <strong id="simulator-precision">--</strong>
+          <p>Fiabilidad cuando el modelo dice “positivo”.</p>
+        </article>
+
+        <article class="metric-card">
+          <span class="metric-label">Recall</span>
+          <strong id="simulator-recall">--</strong>
+          <p>Capacidad para detectar positivos reales.</p>
+        </article>
+
+        <article class="metric-card">
+          <span class="metric-label">F1-Score</span>
+          <strong id="simulator-f1-score">--</strong>
+          <p>Equilibrio entre Precision y Recall.</p>
+        </article>
+      </div>
+
+      <div class="placeholder-card">
+        <h3>Lectura automática</h3>
+        <p id="simulator-insight">
+          Modifica los valores para ver cómo cambia la interpretación.
+        </p>
       </div>
     </section>
 
@@ -822,8 +1212,69 @@
       <p class="eyebrow">Cierre</p>
       <h2>¿Qué error estás dispuesto a aceptar?</h2>
       <p>
-        Hemos jugado a ser un modelo de clasificación. Hemos visto que acertar mucho no basta. Lo importante es entender qué tipo de error estamos cometiendo y quién paga el precio de ese error.
+        Hemos jugado a ser un modelo de clasificación. Hemos visto que acertar mucho no basta.
+        Accuracy puede mentir, Recall te dice si dejas escapar lo importante, Precision te dice si puedes confiar cuando dices “sí”,
+        y F1 te obliga a equilibrar ambas.
       </p>
+
+      <div class="placeholder-card">
+        <h3>Lo más importante no son las fórmulas</h3>
+        <p>
+          Lo importante es la pregunta que hay detrás: ¿qué error estás dispuesto a aceptar y quién paga el precio de ese error?
+        </p>
+        <p>
+          Cuando evaluéis un modelo en vuestros proyectos, no miréis solo el número. Mirad quién se beneficia de ese número
+          y quién puede quedar perjudicado cuando el modelo se equivoca.
+        </p>
+      </div>
+
+      <div class="metrics-grid">
+        <article class="metric-card">
+          <span class="metric-label">Accuracy</span>
+          <strong>Aciertos globales</strong>
+          <p>Útil cuando las clases están equilibradas y todos los errores cuestan parecido.</p>
+        </article>
+
+        <article class="metric-card">
+          <span class="metric-label">Recall</span>
+          <strong>No dejar escapar lo importante</strong>
+          <p>Clave cuando un falso negativo puede ser grave.</p>
+        </article>
+
+        <article class="metric-card">
+          <span class="metric-label">Precision</span>
+          <strong>No acusar sin fiabilidad</strong>
+          <p>Clave cuando una falsa alarma puede dañar a una persona o generar costes altos.</p>
+        </article>
+
+        <article class="metric-card">
+          <span class="metric-label">F1-Score</span>
+          <strong>Equilibrio</strong>
+          <p>Resume si el modelo detecta bien sin disparar demasiadas falsas alarmas.</p>
+        </article>
+      </div>
+
+      <div class="placeholder-card">
+        <h3>Glosario rápido</h3>
+        <dl class="settings-summary">
+          <div>
+            <dt>Classification</dt>
+            <dd>Tarea de asignar datos a categorías predefinidas.</dd>
+          </div>
+          <div>
+            <dt>Confusion Matrix</dt>
+            <dd>Tabla que cuenta aciertos y errores de clasificación.</dd>
+          </div>
+          <div>
+            <dt>Threshold</dt>
+            <dd>Umbral a partir del cual el modelo decide decir “sí” o “no”.</dd>
+          </div>
+          <div>
+            <dt>Overfitting</dt>
+            <dd>Cuando el modelo memoriza en lugar de aprender a generalizar.</dd>
+          </div>
+        </dl>
+      </div>
 
       <div class="placeholder-card">
         <h3>David Rojas Cruz</h3>
