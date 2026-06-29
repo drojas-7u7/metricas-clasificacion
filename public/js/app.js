@@ -605,7 +605,7 @@ function renderPublicPhaseState(village) {
     if (village.phase === 'roleReveal') {
       setText(
         'live-narrator-status',
-        `La partida de ${village.name} ha comenzado. Los habitantes están viendo qué roles les ha tocado.`
+        `La partida de ${village.name} ha comenzado. Los jugadores están viendo qué roles les ha tocado.`
       );
     }
 
@@ -847,7 +847,7 @@ function renderFinalGroupList(listId, players = [], emptyText = 'Nadie.') {
   }
 
   players.forEach((player) => {
-    appendListItem(list, `${player.name} (${player.roleLabel || 'Habitante'}).`);
+    appendListItem(list, `${player.name} (${player.roleLabel || 'Jugador'}).`);
   });
 }
 
@@ -1705,7 +1705,7 @@ function renderActiveVillages(villages = []) {
     title.textContent = village.name;
 
     const details = document.createElement('span');
-    details.textContent = `Habitantes: ${village.currentPlayers} · Estado: ${village.statusLabel} · Narrador: ${village.narrator.name}`;
+    details.textContent = `Jugadores: ${village.currentPlayers} · Estado: ${village.statusLabel} · Narrador: ${village.narrator.name}`;
 
     const code = document.createElement('span');
     code.className = 'village-list-code';
@@ -1810,7 +1810,7 @@ function renderVillageState(village) {
       hidePrivateNightPanel();
       showGameScreen('player-waiting-screen');
       setText('waiting-village-status', `Te has unido a ${villageName}. Espera a que ${narratorName} inicie la partida.`);
-      setText('village-status', `Habitantes actuales: ${currentPlayers}. Estado: ${village.statusLabel}.`);
+      setText('village-status', `Jugadores actuales: ${currentPlayers}. Estado: ${village.statusLabel}.`);
     }
   }
 }
@@ -2044,7 +2044,7 @@ function resetVillageUi(message) {
   setText('setup-village-name', 'Pueblo sin nombre');
   setText('setup-village-code', '----');
   setText('setup-current-players', '0');
-  setText('setup-status-label', 'Esperando habitantes');
+  setText('setup-status-label', 'Esperando jugadores');
 
   setText('waiting-village-name', 'Esperando al pueblo');
   setText('waiting-village-title', 'Pueblo activo');
@@ -2129,7 +2129,7 @@ socket.on('village:reopened', (village) => {
   renderVillageState(village);
 
   if (currentUserRole === 'narrator') {
-    showNotice('narrator', 'El pueblo se ha reabierto. Pueden entrar o salir habitantes de nuevo.');
+    showNotice('narrator', 'El pueblo se ha reabierto. Pueden entrar o salir jugadores de nuevo.');
   }
 
   if (currentUserRole === 'player') {

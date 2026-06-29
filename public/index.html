@@ -41,7 +41,7 @@
         <p class="eyebrow">Experiencia multiplayer</p>
         <h2>El Pueblo Duerme</h2>
         <p>
-          Crea un pueblo como narrador o únete como jugador. El código sirve solo como invitación; el pueblo tendrá su propio nombre, habitantes actuales y estado de partida.
+          Crea un pueblo como narrador o únete como jugador. El código sirve solo como invitación; el pueblo tendrá su propio nombre, jugadores actuales y estado de partida.
         </p>
 
         <section class="active-villages-panel" aria-live="polite">
@@ -65,7 +65,7 @@
           <article class="lobby-card">
             <h3>Soy narrador</h3>
             <p>
-              Crea un pueblo, espera a que entren los habitantes y marca el pueblo como completo antes de configurar la partida.
+              Crea un pueblo, espera a que entren los jugadores y marca el pueblo como completo antes de configurar la partida.
             </p>
 
             <label class="form-field" for="narrator-name">
@@ -110,7 +110,7 @@
         <p class="eyebrow">Panel del narrador</p>
         <h2>Gestionar pueblo</h2>
         <p>
-          Primero espera a que entren los habitantes. Cuando estén todos, marca el pueblo como completo y configura la partida antes de comenzar.
+          Primero espera a que entren los jugadores. Cuando estén todos, marca el pueblo como completo y configura la partida antes de comenzar.
         </p>
 
         <div class="game-board-layout">
@@ -120,7 +120,7 @@
 
             <div class="status-card">
               <span>Estado</span>
-              <strong id="setup-status-label">Esperando habitantes</strong>
+              <strong id="setup-status-label">Esperando jugadores</strong>
             </div>
 
             <div class="button-row">
@@ -188,7 +188,7 @@
               </div>
 
               <div class="status-card">
-                <span>Habitantes actuales</span>
+                <span>Jugadores actuales</span>
                 <strong id="setup-current-players">0</strong>
               </div>
             </div>
@@ -196,7 +196,7 @@
             <dl class="settings-summary">
               <div>
                 <dt>Estado</dt>
-                <dd id="summary-status">Esperando habitantes</dd>
+                <dd id="summary-status">Esperando jugadores</dd>
               </div>
               <div>
                 <dt>Rondas</dt>
@@ -217,9 +217,9 @@
             </dl>
 
             <div class="players-panel">
-              <h3>Habitantes conectados</h3>
+              <h3>Jugadores conectados</h3>
               <ul id="setup-players-list" class="players-list">
-                <li class="empty-state">Aún no hay habitantes conectados.</li>
+                <li class="empty-state">Aún no hay jugadores conectados.</li>
               </ul>
             </div>
           </section>
@@ -255,7 +255,7 @@
             </div>
 
             <div class="status-card">
-              <span>Habitantes actuales</span>
+              <span>Jugadores actuales</span>
               <strong id="waiting-current-players">0</strong>
             </div>
           </div>
@@ -263,7 +263,7 @@
           <dl class="settings-summary">
             <div>
               <dt>Estado</dt>
-              <dd id="waiting-status">Esperando habitantes</dd>
+              <dd id="waiting-status">Esperando jugadores</dd>
             </div>
             <div>
               <dt>Rondas</dt>
@@ -284,9 +284,9 @@
           </dl>
 
           <div class="players-panel">
-            <h3>Habitantes conectados</h3>
+            <h3>Jugadores conectados</h3>
             <ul id="players-list" class="players-list">
-              <li class="empty-state">Aún no hay habitantes conectados.</li>
+              <li class="empty-state">Aún no hay jugadores conectados.</li>
             </ul>
           </div>
         </section>
@@ -632,7 +632,7 @@
             <p class="eyebrow">Votación</p>
             <h3>Elige a quién expulsar</h3>
             <p id="player-voting-message">
-              Cuando el narrador abra la votación, aquí aparecerán los habitantes vivos.
+              Cuando el narrador abra la votación, aquí aparecerán los jugadores vivos.
             </p>
             <p id="player-vote-feedback" class="notice-box" hidden></p>
             <div id="player-voting-targets-list" class="night-targets-list"></div>
@@ -1072,12 +1072,12 @@
       <p class="eyebrow">Reflexión ética</p>
       <h2>Debate</h2>
       <p>
-        Hemos visto que F1 resume el equilibrio de un modelo. Pero un F1 global puede esconder diferencias importantes
-        entre regiones, grupos o poblaciones.
+        Las métricas no solo sirven para comparar modelos. También nos obligan a pensar qué errores aceptamos
+        y a quién afectan esos errores.
       </p>
 
       <div class="placeholder-card">
-        <h3>Pregunta elegida</h3>
+        <h3>Pregunta para debatir</h3>
         <p class="debate-question">
           Un modelo de predicción de riesgo de incendios forestales tiene F1 del 72% a nivel nacional.
           Al desglosar por regiones, en Galicia es del 85% y en Extremadura del 38%.
@@ -1085,57 +1085,51 @@
         </p>
       </div>
 
-      <div class="placeholder-card">
-        <h3>Por qué esta pregunta funciona</h3>
-        <p>
-          Un F1 global del 72% no es perfecto, pero puede parecer razonable. El problema aparece al mirar por regiones:
-          el modelo funciona muy bien en Galicia y muy mal en Extremadura.
-        </p>
-        <p>
-          La pregunta ya no es solo si el modelo funciona técnicamente. La pregunta es si es justo desplegar un sistema
-          que protege mejor a unos territorios que a otros.
-        </p>
-      </div>
-
-      <div class="metrics-grid">
-        <article class="metric-card">
-          <span class="metric-label">Posición 1</span>
-          <strong>Sí, desplegar</strong>
-          <p>
-            El modelo puede ser mejor que no tener nada. Aunque falle en algunas zonas, podría ayudar a prevenir parte del riesgo.
-          </p>
-        </article>
-
-        <article class="metric-card">
-          <span class="metric-label">Posición 2</span>
-          <strong>No, esperar</strong>
-          <p>
-            Un F1 del 38% en Extremadura puede ser inaceptable. Desplegarlo podría dejar peor protegida a una región concreta.
-          </p>
-        </article>
-
-        <article class="metric-card">
-          <span class="metric-label">Posición 3</span>
-          <strong>Depende</strong>
-          <p>
-            Depende del uso: si es apoyo para humanos, si se avisa de la baja fiabilidad regional y si existen medidas compensatorias.
-          </p>
-        </article>
-
-        <article class="metric-card">
-          <span class="metric-label">Posición 4</span>
-          <strong>Desplegar con advertencia</strong>
-          <p>
-            Se podría usar el modelo indicando explícitamente que en Extremadura su fiabilidad es baja y requiere revisión humana.
-          </p>
-        </article>
-      </div>
-
       <details class="placeholder-card">
-        <summary>Guía para moderar</summary>
+        <summary>💡 Pista si el grupo se queda en blanco</summary>
         <p>
-          Da unos segundos para pensar. Pide una votación rápida: sí, no o depende. Después pide uno o dos argumentos.
-          No hace falta cerrar con una respuesta única. El objetivo es que el grupo entienda que una métrica global puede ocultar daños locales.
+          Una forma de desbloquear el debate es recordar que el 72% nacional puede parecer aceptable,
+          pero esconde una diferencia importante entre regiones. La pregunta no es solo si el modelo funciona,
+          sino si funciona de forma suficientemente justa para todas las personas afectadas.
+        </p>
+
+        <div class="metrics-grid">
+          <article class="metric-card">
+            <span class="metric-label">Posición 1</span>
+            <strong>Sí, desplegar</strong>
+            <p>
+              Podría ser mejor que no tener ningún sistema. Aunque no sea perfecto, puede ayudar a prevenir parte del riesgo.
+            </p>
+          </article>
+
+          <article class="metric-card">
+            <span class="metric-label">Posición 2</span>
+            <strong>No, esperar</strong>
+            <p>
+              Si en Extremadura el F1 es del 38%, el modelo podría proteger mucho peor a una región concreta.
+            </p>
+          </article>
+
+          <article class="metric-card">
+            <span class="metric-label">Posición 3</span>
+            <strong>Depende del uso</strong>
+            <p>
+              Podría usarse como apoyo a personas expertas, pero no como decisión automática.
+            </p>
+          </article>
+
+          <article class="metric-card">
+            <span class="metric-label">Posición 4</span>
+            <strong>Desplegar con límites</strong>
+            <p>
+              Se podría desplegar solo donde el modelo es fiable, o exigir revisión humana reforzada donde falla más.
+            </p>
+          </article>
+        </div>
+
+        <p>
+          La idea final es que una métrica global puede ocultar problemas locales. Evaluar un modelo también implica
+          decidir si sus errores están repartidos de forma aceptable.
         </p>
       </details>
     </section>

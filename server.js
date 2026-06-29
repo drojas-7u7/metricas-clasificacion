@@ -33,7 +33,7 @@ const defaultSettings = {
 };
 
 const statusLabels = {
-  waiting: 'Esperando habitantes',
+  waiting: 'Esperando jugadores',
   setup: 'Pueblo completo',
   live: 'Partida iniciada',
 };
@@ -44,7 +44,7 @@ const roleLabels = {
 };
 
 const phaseLabels = {
-  lobby: 'Esperando habitantes',
+  lobby: 'Esperando jugadores',
   roleReveal: 'Revelación de roles',
   night: 'Noche',
   nightClosed: 'Noche cerrada',
@@ -105,11 +105,11 @@ function validatePlayableSettings(village, settings) {
   const villagersAfterFullNight = villagersCount - killersCount;
 
   if (currentPlayers < 3) {
-    return 'Debe haber al menos 3 habitantes para configurar una partida equilibrada.';
+    return 'Debe haber al menos 3 jugadores para configurar una partida equilibrada.';
   }
 
   if (killersCount > maxKillersCount || villagersAfterFullNight <= killersCount) {
-    return `La partida quedaría desequilibrada tras la primera noche. Con ${currentPlayers} habitantes, el máximo recomendado de asesinos es ${maxKillersCount}.`;
+    return `La partida quedaría desequilibrada tras la primera noche. Con ${currentPlayers} jugadores, el máximo recomendado de asesinos es ${maxKillersCount}.`;
   }
 
   return null;
@@ -262,11 +262,11 @@ function getPublicVillageState(village) {
 
 function getPublicPhaseMessage(village) {
   if (village.phase === 'roleReveal') {
-    return 'Los habitantes están viendo qué roles les ha tocado.';
+    return 'Los jugadores están viendo qué roles les ha tocado.';
   }
 
   if (village.phase === 'night') {
-    return 'El pueblo duerme. Los habitantes mantienen los ojos cerrados.';
+    return 'El pueblo duerme. Los jugadores mantienen los ojos cerrados.';
   }
 
   if (village.phase === 'nightClosed') {
@@ -289,7 +289,7 @@ function getPublicPhaseMessage(village) {
     return 'La votación ha terminado. El narrador puede revisar el resultado.';
   }
 
-  return 'El pueblo está esperando habitantes.';
+  return 'El pueblo está esperando jugadores.';
 }
 
 function getNightActionsSummary(village) {
@@ -552,7 +552,7 @@ function buildVotingResult(village) {
 
     return {
       voterId,
-      voterName: voter?.name || 'Habitante desconocido',
+      voterName: voter?.name || 'Jugador desconocido',
       targetId,
       targetName: targetId === NO_VOTE_TARGET ? 'No votar a nadie' : target?.name || 'Objetivo desconocido',
       noVote: targetId === NO_VOTE_TARGET,
@@ -979,7 +979,7 @@ function getPublicVotingState(village) {
 
       return {
         voterId,
-        voterName: voter?.name || 'Habitante desconocido',
+        voterName: voter?.name || 'Jugador desconocido',
         targetId,
         targetName: targetId === NO_VOTE_TARGET ? 'No votar a nadie' : target?.name || 'Objetivo desconocido',
         noVote: targetId === NO_VOTE_TARGET,
@@ -1445,7 +1445,7 @@ io.on('connection', (socket) => {
 
     if (village.players.length < 3) {
       socket.emit('village:error', {
-        message: 'Debe haber al menos 3 habitantes antes de cerrar el pueblo.',
+        message: 'Debe haber al menos 3 jugadores antes de cerrar el pueblo.',
       });
       return;
     }
@@ -1484,7 +1484,7 @@ io.on('connection', (socket) => {
 
     if (village.status === 'waiting') {
       socket.emit('village:error', {
-        message: 'El pueblo ya está abierto esperando habitantes.',
+        message: 'El pueblo ya está abierto esperando jugadores.',
       });
       return;
     }
@@ -1889,7 +1889,7 @@ io.on('connection', (socket) => {
       socket.emit('village:error', {
         message: isRunoff
           ? 'En la segunda votación solo puedes votar entre las personas empatadas.'
-          : 'Solo puedes votar a habitantes vivos.',
+          : 'Solo puedes votar a jugadores vivos.',
       });
       return;
     }
